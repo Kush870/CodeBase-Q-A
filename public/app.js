@@ -24,14 +24,46 @@ const sendBtn = document.getElementById('send-btn');
 const readmeOutput = document.getElementById('readme-output');
 const generateReadmeBtn = document.getElementById('generate-readme-btn');
 
-const currentFilename = document.getElementById('current-filename');
 const currentFilepath = document.getElementById('current-filepath');
 const codeBlock = document.getElementById('code-block');
 
 // On Page Load
 document.addEventListener('DOMContentLoaded', () => {
-  checkServerStatus();
+  resetCodebaseState();
 });
+
+// Reset codebase state on page reload
+async function resetCodebaseState() {
+  try {
+    const res = await fetch('/api/reset', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      console.log('Backend codebase state reset.');
+    }
+  } catch (err) {
+    console.error('Failed to reset codebase state:', err);
+  }
+
+  // Clear stats UI
+  statsPanel.classList.add('hidden');
+  statFilesText.innerText = '0';
+  statLinesText.innerText = '0';
+  statSizeText.innerText = '0 KB';
+  indexedRepoNameText.innerText = 'None';
+
+  // Clear files list
+  allFiles = [];
+  fileListContainer.innerHTML = '<div class="empty-state">No repository indexed yet.</div>';
+
+  // Reset dropdown list in viewer
+  const select = document.getElementById('viewer-file-select');
+  if (select) {
+    select.innerHTML = '<option value="">Select a file to view...</option>';
+  }
+
+  // Run status checks to verify API key is configured
+  checkServerStatus();
+}
 
 // Check status of server at startup
 async function checkServerStatus() {
@@ -41,19 +73,6 @@ async function checkServerStatus() {
     
     if (data.success) {
       updateStatusBanner(data.isApiKeyConfigured, data.hasIndexedRepo);
-      
-      if (data.hasIndexedRepo) {
-        indexedRepoName = data.repoName;
-        // Fetch files from status data or trigger index re-fetch
-        updateStatsUI(data.stats, data.repoName);
-        
-        // Fetch files lists (we can mock index output or get file tree by running empty index)
-        // For simplicity, let's load files list from index request
-        allFiles = [];
-        fileListContainer.innerHTML = '<div class="empty-state">Re-indexing to load file tree...</div>';
-        // Auto trigger a quick indexing of the saved path to populate the tree
-        repopulateFileTree();
-      }
     }
   } catch (err) {
     console.error('Failed to connect to backend server:', err);
@@ -92,22 +111,6 @@ function updateStatusBanner(isKeyConfigured, hasIndexed) {
         <span><strong>API Connected:</strong> Codebase <strong>${indexedRepoName}</strong> is ready.</span>
       </div>
     `;
-  }
-}
-
-// Repopulate files list if server already has indexed repository
-async function repopulateFileTree() {
-  try {
-    // If we have a local path stored in status, we query it again
-    const statusRes = await fetch('/api/status');
-    const statusData = await statusRes.json();
-    if (statusData.hasIndexedRepo) {
-      // Re-trigger scanning
-      // To avoid forcing path inputs, let's load files via a query check or similar
-      // Since it's stored on backend, we can modify indexing endpoint to return files list
-    }
-  } catch (e) {
-    console.error(e);
   }
 }
 
@@ -170,6 +173,7 @@ async function handleIndex(event) {
       
       updateStatsUI(data.stats, data.repoName);
       renderFileList(allFiles);
+      updateFileSelectDropdown(allFiles);
       checkServerStatus(); // refresh API key state UI banner
     } else {
       alert(`Error indexing codebase: ${data.error}`);
@@ -228,8 +232,36 @@ function filterFilesList() {
   renderFileList(filtered);
 }
 
+// Update dropdown selector in Code Viewer
+function updateFileSelectDropdown(files) {
+  const select = document.getElementById('viewer-file-select');
+  if (!select) return;
+  select.innerHTML = '<option value="">Select a file to view...</option>';
+  files.forEach(file => {
+    const opt = document.createElement('option');
+    opt.value = file.path;
+    opt.textContent = file.path;
+    select.appendChild(opt);
+  });
+}
+
 // Load selected file in Code Viewer
 async function loadFileInViewer(filePath) {
+  if (!filePath) {
+    currentFilepath.innerText = 'No active file';
+    codeBlock.className = 'language-text';
+    codeBlock.innerText = 'Select a file to view its syntax-highlighted content.';
+    const fileItems = document.querySelectorAll('.file-item');
+    fileItems.forEach(item => item.classList.remove('active'));
+    return;
+  }
+
+  // Sync select dropdown selection
+  const select = document.getElementById('viewer-file-select');
+  if (select) {
+    select.value = filePath;
+  }
+
   // Highlight active file in sidebar list
   const fileItems = document.querySelectorAll('.file-item');
   fileItems.forEach(item => {
@@ -240,7 +272,6 @@ async function loadFileInViewer(filePath) {
     }
   });
 
-  currentFilename.innerText = filePath.split('/').pop();
   currentFilepath.innerText = filePath;
   codeBlock.className = 'language-text';
   codeBlock.innerText = 'Loading file content...';

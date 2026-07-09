@@ -63,3 +63,14 @@ Implemented four major backend API load optimizations:
 - In-Memory Query Cache: Added `queryCache` Map to save and return identical query responses instantly.
 - README Draft Cache: Added `readmeCache` Map to optimize duplicate README generation runs.
 - All caches are cleared automatically when a new repository is indexed.
+
+--------------------------------------------------------------------------------
+6. CACHE RESET ON REFRESH & IN-VIEWER FILE EXPLORER
+--------------------------------------------------------------------------------
+[Prompt]
+Clear the indexed codebase files and statistics from the UI on browser refresh. In the Code Viewer tab, implement a file selection dropdown so users can open and switch between any indexed file directly within the viewer.
+
+[Response Summary]
+- Reset on Refresh: Added a `/api/reset` POST endpoint to clear backend index state and caches. Set up the frontend to request this reset upon page load (`DOMContentLoaded`), clearing all stats panels, trees, and viewer files.
+- In-Viewer File Selection: Replaced the static header in the Code Viewer with a styled `<select>` dropdown (`.viewer-select`). Populated the dropdown dynamically with all indexed files upon successful scanning, enabling quick file switching inside the viewer tab.
+

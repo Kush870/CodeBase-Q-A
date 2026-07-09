@@ -885,3 +885,29 @@ input, textarea, select, button {
 .line-numbers-rows > span:before {
   color: var(--text-dim) !important;
 }
+
+/* File selection dropdown inside the Code Viewer tab */
+.viewer-select {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  max-width: 400px;
+  width: 280px;
+  transition: all 0.2s ease;
+}
+
+.viewer-select:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+}
+
+.viewer-select option {
+  background-color: var(--bg-secondary);
+  color: var(--text-main);
+}

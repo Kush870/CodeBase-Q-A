@@ -202,6 +202,26 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// Reset endpoint to clear indexing state on page reload
+app.post('/api/reset', (req, res) => {
+  currentIndexedRepo = {
+    repoName: '',
+    repoType: '',
+    localPath: '',
+    githubUrl: '',
+    files: [],
+    stats: {
+      totalFiles: 0,
+      totalLines: 0,
+      totalBytes: 0
+    }
+  };
+  queryCache.clear();
+  readmeCache.clear();
+  console.log('Indexed repository state has been reset.');
+  res.json({ success: true, message: 'Codebase state has been reset successfully.' });
+});
+
 // Indexing endpoint
 app.post('/api/index', async (req, res) => {
   const { path: targetPath, type } = req.body;
