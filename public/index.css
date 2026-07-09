@@ -1,24 +1,24 @@
 /* ==========================================================================
-   DESIGN SYSTEM & VARIABLES (Teal, Cyan, and Sleek Dark Slate)
+   DESIGN SYSTEM & VARIABLES (Slate, Teal, and Cyan Palette)
    ========================================================================== */
 :root {
-  --bg-primary: #070a13;
-  --bg-secondary: #0f1424;
-  --bg-tertiary: #161c33;
+  --bg-primary: #070911;
+  --bg-secondary: #0f1322;
+  --bg-tertiary: #171d33;
   
   --accent-teal: #0d9488;
   --accent-teal-hover: #14b8a6;
   --accent-cyan: #0ea5e9;
   --accent-cyan-hover: #38bdf8;
   
-  --text-main: #f8fafc;
+  --text-main: #f1f5f9;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
   
   --border-color: #1e293b;
-  --border-light: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.05);
   
-  --glass-bg: rgba(15, 20, 36, 0.65);
+  --glass-bg: rgba(15, 19, 34, 0.65);
   --glass-blur: blur(12px);
   
   --success: #10b981;
@@ -28,7 +28,7 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'Fira Code', monospace;
   
-  --sidebar-width: 330px;
+  --sidebar-width: 320px;
 }
 
 /* ==========================================================================
@@ -92,13 +92,13 @@ input, textarea, select, button {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 20px;
+  padding: 16px;
   flex-shrink: 0;
   backdrop-filter: var(--glass-blur);
 }
 
 .sidebar-header {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .logo {
@@ -108,7 +108,7 @@ input, textarea, select, button {
 }
 
 .logo h2 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.5px;
   background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
@@ -121,30 +121,30 @@ input, textarea, select, button {
 }
 
 .subtitle {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* Config Status Banners */
 .status-card {
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  margin-bottom: 20px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin-bottom: 16px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
 }
 
 .status-card.warning {
-  background-color: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.25);
+  background-color: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
 }
 
 .status-card.success {
-  background-color: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.25);
+  background-color: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.2);
   color: #34d399;
 }
 
@@ -155,28 +155,28 @@ input, textarea, select, button {
 }
 
 .indicator {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   display: inline-block;
   background-color: currentColor;
-  box-shadow: 0 0 8px currentColor;
+  box-shadow: 0 0 6px currentColor;
 }
 
 /* Sidebar Section Headers */
 .sidebar-section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
 }
 
 .sidebar-section h3 {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-muted);
   letter-spacing: 0.5px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 /* Mini Tab Selectors */
@@ -185,7 +185,7 @@ input, textarea, select, button {
   background-color: var(--bg-primary);
   padding: 3px;
   border-radius: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   border: 1px solid var(--border-color);
 }
 
@@ -194,9 +194,9 @@ input, textarea, select, button {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  padding: 6px;
+  padding: 5px;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -205,19 +205,18 @@ input, textarea, select, button {
 .mini-tab.active {
   background-color: var(--bg-tertiary);
   color: var(--text-main);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* Inputs and Forms */
 .input-group {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .input-group label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -228,9 +227,9 @@ input, textarea, select, button {
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-main);
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   outline: none;
   transition: all 0.2s ease;
 }
@@ -239,7 +238,7 @@ input, textarea, select, button {
 .input-group select:focus, 
 .input-group textarea:focus {
   border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.12);
 }
 
 /* Buttons */
@@ -247,10 +246,10 @@ input, textarea, select, button {
   background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
   color: #fff;
   border: none;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: 6px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -262,7 +261,7 @@ input, textarea, select, button {
 .primary-btn:hover {
   opacity: 0.95;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
 }
 
 .primary-btn:active {
@@ -273,10 +272,10 @@ input, textarea, select, button {
   background-color: var(--bg-primary);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 6px;
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -290,10 +289,10 @@ input, textarea, select, button {
 }
 
 .icon-only {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   padding: 0;
-  border-radius: 8px;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
@@ -301,14 +300,14 @@ input, textarea, select, button {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .stat-item {
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
-  padding: 8px;
+  padding: 6px;
   border-radius: 6px;
   text-align: center;
 }
@@ -316,22 +315,22 @@ input, textarea, select, button {
 .stat-val {
   display: block;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--accent-cyan);
 }
 
 .stat-label {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .repo-meta-name {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   background-color: var(--bg-primary);
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 4px;
   border-left: 2px solid var(--accent-teal);
   word-break: break-all;
@@ -344,7 +343,7 @@ input, textarea, select, button {
 }
 
 .search-files-box {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .search-files-box input {
@@ -354,7 +353,7 @@ input, textarea, select, button {
   color: var(--text-main);
   padding: 6px 10px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   outline: none;
 }
 
@@ -368,43 +367,70 @@ input, textarea, select, button {
   border: 1px solid var(--border-color);
   background-color: var(--bg-primary);
   border-radius: 6px;
-  padding: 8px;
-  max-height: 250px;
+  padding: 6px;
+  height: 250px;
 }
 
-.file-item {
+/* ==========================================================================
+   NESTED HIERARCHICAL FOLDER TREE
+   ========================================================================== */
+.tree-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: 6px;
+  padding: 4px 6px;
   border-radius: 4px;
   font-size: 0.75rem;
   color: var(--text-muted);
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.file-item:hover {
+.tree-item:hover {
   background-color: var(--bg-secondary);
   color: var(--text-main);
 }
 
-.file-item.active {
-  background-color: rgba(14, 165, 233, 0.1);
+.tree-item.file.active {
+  background-color: rgba(14, 165, 233, 0.08);
   color: var(--accent-cyan);
   font-weight: 500;
 }
 
-.file-item svg {
+.tree-children {
+  display: block;
+}
+
+.tree-children.collapsed {
+  display: none;
+}
+
+.folder-toggle-icon {
+  font-size: 0.55rem;
+  width: 10px;
+  display: inline-block;
+  color: var(--text-dim);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.folder-icon {
+  color: var(--accent-teal);
+  fill: rgba(13, 148, 136, 0.12);
+  flex-shrink: 0;
+}
+
+.file-icon {
+  color: var(--text-dim);
   flex-shrink: 0;
 }
 
 .empty-state {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-dim);
   text-align: center;
   padding: 24px 0;
@@ -426,12 +452,12 @@ input, textarea, select, button {
 }
 
 .main-header {
-  height: 56px;
+  height: 48px;
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 16px;
 }
 
 .tabs-nav {
@@ -444,11 +470,11 @@ input, textarea, select, button {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 0 4px;
   cursor: pointer;
   position: relative;
@@ -488,56 +514,82 @@ input, textarea, select, button {
 }
 
 /* ==========================================================================
-   QA CHAT TAB
+   SPLIT-PANE WORKSPACE LAYOUT
+   ========================================================================== */
+.workspace-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid var(--border-color);
+  background-color: rgba(15, 19, 34, 0.25);
+  overflow: hidden;
+}
+
+.code-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #060910;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   QA CHAT CONTAINER
    ========================================================================== */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
+  padding: 16px;
   overflow: hidden;
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 4px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
 /* Welcome UI */
 .chat-welcome {
   text-align: center;
   margin: auto;
-  max-width: 460px;
-  padding: 20px;
+  max-width: 440px;
+  padding: 16px;
 }
 
 .welcome-icon {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
 }
 
 .chat-welcome h2 {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--text-main);
 }
 
 .chat-welcome p {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
-  margin-bottom: 24px;
-  line-height: 1.6;
+  margin-bottom: 18px;
+  line-height: 1.5;
 }
 
 .prompt-suggestions {
@@ -545,7 +597,7 @@ input, textarea, select, button {
 }
 
 .prompt-suggestions h4 {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   color: var(--text-dim);
   margin-bottom: 8px;
@@ -555,18 +607,18 @@ input, textarea, select, button {
 .suggestion-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .chip {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   color: var(--text-muted);
-  font-size: 0.75rem;
-  padding: 6px 12px;
+  font-size: 0.72rem;
+  padding: 4px 10px;
   border-radius: 100px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .chip:hover {
@@ -579,11 +631,11 @@ input, textarea, select, button {
 .msg {
   display: flex;
   flex-direction: column;
-  max-width: 85%;
-  padding: 14px 18px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  max-width: 90%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 .msg.user {
@@ -596,66 +648,97 @@ input, textarea, select, button {
 
 .msg.assistant {
   align-self: flex-start;
-  background-color: rgba(15, 20, 36, 0.4);
+  background-color: rgba(15, 19, 34, 0.4);
   border: 1px solid var(--border-light);
   border-bottom-left-radius: 2px;
   color: var(--text-main);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Message content styles (markdown rendering emulation) */
+/* Markdown parsing rendering styles */
 .msg-body p {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .msg-body p:last-child {
   margin-bottom: 0;
 }
 
+.msg-body h1, .msg-body h2, .msg-body h3, .msg-body h4 {
+  color: var(--text-main);
+  margin: 12px 0 6px 0;
+  font-weight: 600;
+}
+
+.msg-body h1 { font-size: 1.15rem; }
+.msg-body h2 { font-size: 1.05rem; }
+.msg-body h3 { font-size: 0.95rem; }
+.msg-body h4 { font-size: 0.88rem; }
+
 .msg-body pre {
-  background-color: rgba(0, 0, 0, 0.3) !important;
+  background-color: rgba(0, 0, 0, 0.4) !important;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 6px;
-  padding: 12px;
-  margin: 10px 0;
+  padding: 10px;
+  margin: 8px 0;
   overflow-x: auto;
 }
 
 .msg-body code {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  background-color: rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  background-color: rgba(255, 255, 255, 0.06);
   padding: 2px 4px;
   border-radius: 4px;
+  color: #38bdf8;
 }
 
 .msg-body pre code {
   background-color: transparent;
   padding: 0;
   border-radius: 0;
+  color: inherit;
 }
 
 .msg-body ul, .msg-body ol {
-  margin-left: 20px;
-  margin-bottom: 12px;
+  margin-left: 18px;
+  margin-bottom: 8px;
 }
 
 .msg-body li {
-  margin-bottom: 4px;
+  margin-bottom: 3px;
+}
+
+.msg-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 0.8rem;
+}
+
+.msg-body th, .msg-body td {
+  border: 1px solid var(--border-color);
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.msg-body th {
+  background-color: var(--bg-secondary);
+  font-weight: 600;
 }
 
 /* File Badge Links */
 .references-container {
-  margin-top: 14px;
-  padding-top: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
   border-top: 1px dashed var(--border-color);
 }
 
 .ref-label {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-dim);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   text-transform: uppercase;
   font-weight: 600;
 }
@@ -667,17 +750,17 @@ input, textarea, select, button {
 }
 
 .ref-badge {
-  background-color: rgba(14, 165, 233, 0.08);
-  border: 1px solid rgba(14, 165, 233, 0.2);
+  background-color: rgba(14, 165, 233, 0.06);
+  border: 1px solid rgba(14, 165, 233, 0.15);
   color: var(--accent-cyan);
-  font-size: 0.72rem;
-  padding: 4px 8px;
+  font-size: 0.7rem;
+  padding: 3px 6px;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .ref-badge:hover {
@@ -690,15 +773,15 @@ input, textarea, select, button {
 .loading-msg {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
+  gap: 10px;
+  padding: 10px;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .spinner {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-top: 2px solid var(--accent-cyan);
   border-radius: 50%;
@@ -714,14 +797,14 @@ input, textarea, select, button {
 .chat-input-area {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 6px 10px;
 }
 
 .chat-input-area form {
   display: flex;
   align-items: flex-end;
-  gap: 12px;
+  gap: 10px;
 }
 
 .chat-input-area textarea {
@@ -731,11 +814,11 @@ input, textarea, select, button {
   color: var(--text-main);
   resize: none;
   outline: none;
-  font-size: 0.88rem;
-  padding: 6px 0;
+  font-size: 0.84rem;
+  padding: 4px 0;
   line-height: 1.4;
-  height: 40px;
-  max-height: 120px;
+  height: 36px;
+  max-height: 100px;
 }
 
 /* ==========================================================================
@@ -743,29 +826,29 @@ input, textarea, select, button {
    ========================================================================== */
 .readme-container {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 360px 1fr;
   height: 100%;
   width: 100%;
   overflow: hidden;
 }
 
 .readme-settings {
-  padding: 24px;
+  padding: 20px;
   border-right: 1px solid var(--border-color);
   overflow-y: auto;
   background-color: var(--bg-secondary);
 }
 
 .readme-settings h2 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .section-desc {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .readme-preview {
@@ -776,24 +859,24 @@ input, textarea, select, button {
 }
 
 .preview-header {
-  height: 56px;
-  padding: 0 24px;
+  height: 48px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: rgba(15, 20, 36, 0.4);
+  background-color: rgba(15, 19, 34, 0.4);
 }
 
 .preview-header h3 {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-muted);
 }
 
 .preview-body {
   flex: 1;
-  padding: 24px;
+  padding: 16px;
   overflow: hidden;
 }
 
@@ -804,16 +887,16 @@ input, textarea, select, button {
   border: 1px solid var(--border-color);
   color: var(--text-main);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  padding: 16px;
+  font-size: 0.8rem;
+  padding: 12px;
   border-radius: 8px;
   outline: none;
   resize: none;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* ==========================================================================
-   CODE VIEWER TAB
+   CODE VIEWER PANEL
    ========================================================================== */
 .code-viewer-container {
   display: flex;
@@ -824,8 +907,8 @@ input, textarea, select, button {
 }
 
 .code-viewer-header {
-  height: 56px;
-  padding: 0 24px;
+  height: 48px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -839,21 +922,46 @@ input, textarea, select, button {
   gap: 8px;
 }
 
-.code-file-info h3 {
-  font-size: 0.95rem;
-  font-weight: 600;
+/* Styled Dropdown select inside Code Viewer Header */
+.viewer-select {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  max-width: 320px;
+  width: 240px;
+  transition: all 0.2s ease;
+}
+
+.viewer-select:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.12);
+}
+
+.viewer-select option {
+  background-color: var(--bg-secondary);
+  color: var(--text-main);
 }
 
 .code-file-path {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-dim);
   font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 250px;
 }
 
 .code-viewer-body {
   flex: 1;
   overflow: auto;
-  background-color: #070a13;
+  background-color: #060910;
   padding: 0;
   position: relative;
 }
@@ -861,11 +969,11 @@ input, textarea, select, button {
 /* Code Highlighting Customizations */
 .code-viewer-body pre {
   margin: 0 !important;
-  padding: 20px !important;
+  padding: 16px !important;
   height: 100%;
   background: transparent !important;
   font-family: var(--font-mono) !important;
-  font-size: 0.85rem !important;
+  font-size: 0.8rem !important;
   line-height: 1.5 !important;
 }
 
@@ -878,7 +986,7 @@ input, textarea, select, button {
 /* Prism Line Number styling overrides */
 .line-numbers .line-numbers-rows {
   border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-  padding: 20px 0 !important;
+  padding: 16px 0 !important;
   top: 0 !important;
 }
 
@@ -886,28 +994,8 @@ input, textarea, select, button {
   color: var(--text-dim) !important;
 }
 
-/* File selection dropdown inside the Code Viewer tab */
-.viewer-select {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  max-width: 400px;
-  width: 280px;
-  transition: all 0.2s ease;
-}
-
-.viewer-select:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
-}
-
-.viewer-select option {
-  background-color: var(--bg-secondary);
-  color: var(--text-main);
+/* Custom highlighted line numbers for AI references */
+.line-numbers-rows > span.highlighted-line-num {
+  background-color: rgba(14, 165, 233, 0.22) !important;
+  border-left: 2px solid var(--accent-cyan);
 }

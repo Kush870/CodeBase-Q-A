@@ -71,6 +71,22 @@ Implemented four major backend API load optimizations:
 Clear the indexed codebase files and statistics from the UI on browser refresh. In the Code Viewer tab, implement a file selection dropdown so users can open and switch between any indexed file directly within the viewer.
 
 [Response Summary]
-- Reset on Refresh: Added a `/api/reset` POST endpoint to clear backend index state and caches. Set up the frontend to request this reset upon page load (`DOMContentLoaded`), clearing all stats panels, trees, and viewer files.
 - In-Viewer File Selection: Replaced the static header in the Code Viewer with a styled `<select>` dropdown (`.viewer-select`). Populated the dropdown dynamically with all indexed files upon successful scanning, enabling quick file switching inside the viewer tab.
+
+--------------------------------------------------------------------------------
+7. WORKSPACE LAYOUT & DIRECTORY TREE DESIGN SYSTEM
+--------------------------------------------------------------------------------
+[Prompt]
+Enhance the visual design and usability of the interface:
+1. Split Pane Workspace: Combine Chat and Code Viewer side-by-side inside a single Q&A Workspace tab. When file reference badges are clicked, the code opens on the right side instantly without losing chat context.
+2. Nested Folder Tree: Replace the flat list of files with a collapsible/expandable nested folder directory structure tree.
+3. Marked.js Markdown rendering: Add Marked.js parsing to format headers, lists, code snippets, and tables natively.
+4. Glowing Line Range Highlights: Support highlighting specific lines in the viewer and scrolling them smoothly into view when clicked from code reference tags.
+
+[Response Summary]
+- Workspace split layout: Re-structured `index.html` and `index.css` to group Chat panel (left) and Code Viewer (right) side-by-side, creating a productive IDE-like split screen.
+- Directory Tree View: Implemented recursive tree parsing (`buildFileTree`, `renderTree`) in `app.js` with toggleable expand states and styled directory icons. Supports flat fallback listing during search filters.
+- Marked.js integration: Loaded Marked CDN and integrated `marked.parse()` to render professional markdown outputs in chat.
+- Glowing lines scroll: Added parameter scanning for lines (`#L45-L60`) in badge click handlers. Programmed `loadFileInViewer` to apply a glowing cyan line highlight class (`.highlighted-line-num`) to the active ranges and scroll the pre tag smoothly to focus.
+
 

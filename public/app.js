@@ -131,7 +131,7 @@ function switchRepoType(type) {
   }
 }
 
-// Tab Switching (Q&A, README, Code Viewer)
+// Tab Switching (Workspace, README)
 function switchMainTab(tabId) {
   const tabs = document.querySelectorAll('.tab-content');
   tabs.forEach(t => t.classList.remove('active'));
@@ -172,7 +172,7 @@ async function handleIndex(event) {
       indexedRepoName = data.repoName;
       
       updateStatsUI(data.stats, data.repoName);
-      renderFileList(allFiles);
+      renderFileExplorer();
       updateFileSelectDropdown(allFiles);
       checkServerStatus(); // refresh API key state UI banner
     } else {
@@ -204,32 +204,123 @@ function updateStatsUI(stats, repoName) {
   }
 }
 
-// Render File Tree List
-function renderFileList(files) {
-  if (files.length === 0) {
-    fileListContainer.innerHTML = '<div class="empty-state">No matching files found.</div>';
-    return;
-  }
-  
-  fileListContainer.innerHTML = '';
+// Build nested hierarchical tree from flat files array
+function buildFileTree(files) {
+  const root = { name: 'root', type: 'directory', children: {} };
   files.forEach(file => {
-    const div = document.createElement('div');
-    div.className = 'file-item';
-    div.title = file.path;
-    div.onclick = () => loadFileInViewer(file.path);
-    div.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      <span>${file.path}</span>
-    `;
-    fileListContainer.appendChild(div);
+    const parts = file.path.split('/');
+    let current = root;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const isLast = i === parts.length - 1;
+      if (!current.children[part]) {
+        current.children[part] = isLast
+          ? { name: part, type: 'file', path: file.path }
+          : { name: part, type: 'directory', children: {} };
+      }
+      current = current.children[part];
+    }
+  });
+  return root;
+}
+
+// Recursively render directory tree
+function renderTree(node, container, level = 0) {
+  const keys = Object.keys(node.children || {}).sort((a, b) => {
+    const childA = node.children[a];
+    const childB = node.children[b];
+    if (childA.type !== childB.type) {
+      return childA.type === 'directory' ? -1 : 1;
+    }
+    return a.localeCompare(b);
+  });
+
+  keys.forEach(key => {
+    const child = node.children[key];
+    const itemEl = document.createElement('div');
+    itemEl.className = `tree-item ${child.type}`;
+    itemEl.style.paddingLeft = `${level * 10 + 8}px`;
+    
+    if (child.type === 'directory') {
+      const folderId = `folder-${level}-${key.replace(/[^a-zA-Z0-9]/g, '-')}-${Math.random().toString(36).substring(2, 6)}`;
+      itemEl.innerHTML = `
+        <span class="folder-toggle-icon">▼</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="folder-icon"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span>${child.name}</span>
+      `;
+      
+      const childrenContainer = document.createElement('div');
+      childrenContainer.className = 'tree-children';
+      childrenContainer.id = folderId;
+      
+      itemEl.onclick = (e) => {
+        e.stopPropagation();
+        const toggleIcon = itemEl.querySelector('.folder-toggle-icon');
+        const isCollapsed = childrenContainer.classList.toggle('collapsed');
+        toggleIcon.innerText = isCollapsed ? '▶' : '▼';
+        toggleIcon.style.transform = isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+      };
+      
+      container.appendChild(itemEl);
+      container.appendChild(childrenContainer);
+      renderTree(child, childrenContainer, level + 1);
+    } else {
+      itemEl.title = child.path;
+      itemEl.innerHTML = `
+        <span class="folder-toggle-icon"></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>${child.name}</span>
+      `;
+      itemEl.onclick = (e) => {
+        e.stopPropagation();
+        loadFileInViewer(child.path);
+      };
+      container.appendChild(itemEl);
+    }
   });
 }
 
-// Filter files in sidebar list
+// Render file tree explorer in sidebar (supports flat search fallback)
+function renderFileExplorer() {
+  const query = fileSearchInput.value.trim().toLowerCase();
+  
+  if (allFiles.length === 0) {
+    fileListContainer.innerHTML = '<div class="empty-state">No repository indexed yet.</div>';
+    return;
+  }
+
+  fileListContainer.innerHTML = '';
+  
+  if (query === '') {
+    // Render proper directory tree view
+    const tree = buildFileTree(allFiles);
+    renderTree(tree, fileListContainer);
+  } else {
+    // Render flat list view for searches
+    const filtered = allFiles.filter(f => f.path.toLowerCase().includes(query));
+    if (filtered.length === 0) {
+      fileListContainer.innerHTML = '<div class="empty-state">No matching files.</div>';
+      return;
+    }
+    
+    filtered.forEach(file => {
+      const div = document.createElement('div');
+      div.className = 'tree-item file';
+      div.title = file.path;
+      div.style.paddingLeft = '8px';
+      div.onclick = () => loadFileInViewer(file.path);
+      div.innerHTML = `
+        <span class="folder-toggle-icon"></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>${file.path}</span>
+      `;
+      fileListContainer.appendChild(div);
+    });
+  }
+}
+
 function filterFilesList() {
-  const query = fileSearchInput.value.toLowerCase();
-  const filtered = allFiles.filter(f => f.path.toLowerCase().includes(query));
-  renderFileList(filtered);
+  renderFileExplorer();
 }
 
 // Update dropdown selector in Code Viewer
@@ -245,13 +336,13 @@ function updateFileSelectDropdown(files) {
   });
 }
 
-// Load selected file in Code Viewer
-async function loadFileInViewer(filePath) {
+// Load selected file in Code Viewer and support line highlighting
+async function loadFileInViewer(filePath, startLine = null, endLine = null) {
   if (!filePath) {
     currentFilepath.innerText = 'No active file';
     codeBlock.className = 'language-text';
     codeBlock.innerText = 'Select a file to view its syntax-highlighted content.';
-    const fileItems = document.querySelectorAll('.file-item');
+    const fileItems = document.querySelectorAll('.tree-item.file');
     fileItems.forEach(item => item.classList.remove('active'));
     return;
   }
@@ -262,8 +353,8 @@ async function loadFileInViewer(filePath) {
     select.value = filePath;
   }
 
-  // Highlight active file in sidebar list
-  const fileItems = document.querySelectorAll('.file-item');
+  // Highlight active file in tree view
+  const fileItems = document.querySelectorAll('.tree-item.file');
   fileItems.forEach(item => {
     if (item.title === filePath) {
       item.classList.add('active');
@@ -276,7 +367,8 @@ async function loadFileInViewer(filePath) {
   codeBlock.className = 'language-text';
   codeBlock.innerText = 'Loading file content...';
   
-  switchMainTab('code-tab');
+  // Make sure we switch to Q&A Workspace (which has the split screen showing code viewer)
+  switchMainTab('qa-tab');
 
   try {
     const res = await fetch(`/api/file-content?path=${encodeURIComponent(filePath)}`);
@@ -314,6 +406,37 @@ async function loadFileInViewer(filePath) {
       codeBlock.className = langClass;
       codeBlock.textContent = data.content;
       Prism.highlightElement(codeBlock);
+
+      // Handle Line range highlighting and scrolling
+      if (startLine !== null) {
+        setTimeout(() => {
+          const rowsContainer = codeBlock.querySelector('.line-numbers-rows');
+          if (rowsContainer) {
+            const rowSpans = rowsContainer.children;
+            // Clear any old highlighted line classes
+            for (let i = 0; i < rowSpans.length; i++) {
+              rowSpans[i].classList.remove('highlighted-line-num');
+            }
+            // Add highlights to active range
+            const finalEnd = endLine !== null ? endLine : startLine;
+            for (let i = 0; i < rowSpans.length; i++) {
+              const lineNum = i + 1;
+              if (lineNum >= startLine && lineNum <= finalEnd) {
+                rowSpans[i].classList.add('highlighted-line-num');
+              }
+            }
+            // Auto scroll to target line
+            const targetRow = rowSpans[startLine - 1];
+            if (targetRow) {
+              const preContainer = codeBlock.parentElement;
+              preContainer.scrollTo({
+                top: targetRow.offsetTop - 40,
+                behavior: 'smooth'
+              });
+            }
+          }
+        }, 120);
+      }
     } else {
       codeBlock.innerText = `Error loading file: ${data.error}`;
     }
@@ -342,19 +465,14 @@ async function handleSendQuery(event) {
   const query = chatInput.value.trim();
   if (!query) return;
 
-  // Clear input
   chatInput.value = '';
   
-  // Remove welcome screen if present
   const welcomeScreen = document.querySelector('.chat-welcome');
   if (welcomeScreen) {
     welcomeScreen.remove();
   }
 
-  // Render user message bubble
   appendMessage(query, 'user');
-
-  // Render loading bubble
   const loadingId = appendLoadingMessage();
 
   try {
@@ -385,8 +503,12 @@ function appendMessage(text, sender, referencedFiles = []) {
   const bodyDiv = document.createElement('div');
   bodyDiv.className = 'msg-body';
   
-  // Emulate basic markdown parsing for visual layout
-  bodyDiv.innerHTML = parseSimpleMarkdown(text);
+  // Use Marked.js if loaded for premium markdown formatting; fallback to simple replacement
+  if (typeof marked !== 'undefined') {
+    bodyDiv.innerHTML = marked.parse(text);
+  } else {
+    bodyDiv.innerHTML = parseSimpleMarkdown(text);
+  }
   msgDiv.appendChild(bodyDiv);
   
   // Append reference file badges if any
@@ -405,7 +527,22 @@ function appendMessage(text, sender, referencedFiles = []) {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <span>${file}</span>
       `;
-      badge.onclick = () => loadFileInViewer(file);
+      
+      badge.onclick = () => {
+        // Parse line range indicators if present (e.g. file.js#L20-L40 or file.js:45)
+        let pathStr = file;
+        let start = null;
+        let end = null;
+        
+        const lineMatch = file.match(/(.*)(?:#L|:L|:)(\d+)(?:-(\d+))?/);
+        if (lineMatch) {
+          pathStr = lineMatch[1];
+          start = parseInt(lineMatch[2], 10);
+          end = lineMatch[3] ? parseInt(lineMatch[3], 10) : start;
+        }
+        loadFileInViewer(pathStr, start, end);
+      };
+      
       badgesDiv.appendChild(badge);
     });
     
@@ -415,7 +552,7 @@ function appendMessage(text, sender, referencedFiles = []) {
 
   chatMessages.appendChild(msgDiv);
   
-  // Highlight code blocks inside message bubble
+  // Highlight pre code blocks within message replies
   msgDiv.querySelectorAll('pre code').forEach((block) => {
     Prism.highlightElement(block);
   });
@@ -446,38 +583,24 @@ function scrollChatToBottom() {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Simple markdown parsing fallback since we are using Vanilla JS
+// Fallback markdown parsing logic
 function parseSimpleMarkdown(markdown) {
-  // Convert headers
   let html = markdown
     .replace(/^### (.*$)/gim, '<h4>$1</h4>')
     .replace(/^## (.*$)/gim, '<h3>$1</h3>')
     .replace(/^# (.*$)/gim, '<h2>$1</h2>');
   
-  // Convert code blocks (```lang code ```)
   html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, (match, lang, code) => {
     const cleanLang = lang || 'javascript';
-    const escapedCode = code
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return `<pre class="line-numbers"><code class="language-${cleanLang}">${escapedCode}</code></pre>`;
   });
 
-  // Convert inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // Convert bold text
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-  // Convert bullet lists
   html = html.replace(/^\s*-\s+(.*$)/gim, '<li>$1</li>');
   html = html.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
-  
-  // Clean redundant nested uls
   html = html.replace(/<\/ul>\s*<ul>/g, '');
-
-  // Convert line breaks to paragraphs/brs
   html = html.replace(/\n\n/g, '<p></p>');
   html = html.replace(/\n/g, '<br>');
 
@@ -489,7 +612,6 @@ function parseSimpleMarkdown(markdown) {
 // ----------------------------------------
 async function handleGenerateReadme(event) {
   event.preventDefault();
-  
   const section = document.getElementById('readme-section-select').value;
   const additionalInstructions = document.getElementById('readme-instructions').value.trim();
 
