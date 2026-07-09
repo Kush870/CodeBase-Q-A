@@ -1020,3 +1020,83 @@ input, textarea, select, button {
   background-color: rgba(14, 165, 233, 0.22) !important;
   border-left: 2px solid var(--accent-cyan);
 }
+
+/* ==========================================================================
+   THEME COLOR SCHEMES
+   ========================================================================== */
+
+/* Theme: GitHub Dark */
+body[data-theme="github-dark"] {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  
+  --accent-teal: #2ea043;
+  --accent-teal-hover: #3fb950;
+  --accent-cyan: #58a6ff;
+  --accent-cyan-hover: #79c0ff;
+  
+  --text-main: #c9d1d9;
+  --text-muted: #8b949e;
+  --text-dim: #484f58;
+  
+  --border-color: #30363d;
+  --border-light: rgba(240, 246, 252, 0.05);
+}
+
+/* Theme: Nord Arctic Frost */
+body[data-theme="nord"] {
+  --bg-primary: #2e3440;
+  --bg-secondary: #3b4252;
+  --bg-tertiary: #434c5e;
+  
+  --accent-teal: #a3be8c;
+  --accent-teal-hover: #8fbcbb;
+  --accent-cyan: #88c0d0;
+  --accent-cyan-hover: #81a1c1;
+  
+  --text-main: #eceff4;
+  --text-muted: #d8dee9;
+  --text-dim: #4c566a;
+  
+  --border-color: #434c5e;
+  --border-light: rgba(255, 255, 255, 0.03);
+}
+
+/* Theme: One Dark */
+body[data-theme="one-dark"] {
+  --bg-primary: #1e222b;
+  --bg-secondary: #21252b;
+  --bg-tertiary: #282c34;
+  
+  --accent-teal: #98c379;
+  --accent-teal-hover: #a0c984;
+  --accent-cyan: #61afef;
+  --accent-cyan-hover: #76bcff;
+  
+  --text-main: #abb2bf;
+  --text-muted: #828997;
+  --text-dim: #5c6370;
+  
+  --border-color: #3e4451;
+  --border-light: rgba(255, 255, 255, 0.04);
+}
+
+/* Theme: Forest Hacker */
+body[data-theme="forest"] {
+  --bg-primary: #070a08;
+  --bg-secondary: #0f1411;
+  --bg-tertiary: #17201b;
+  
+  --accent-teal: #10b981;
+  --accent-teal-hover: #34d399;
+  --accent-cyan: #059669;
+  --accent-cyan-hover: #10b981;
+  
+  --text-main: #e2e8f0;
+  --text-muted: #8f9e96;
+  --text-dim: #38463f;
+  
+  --border-color: #1b2d24;
+  --border-light: rgba(16, 185, 129, 0.04);
+}

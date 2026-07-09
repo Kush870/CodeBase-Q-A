@@ -99,5 +99,17 @@ Make the split pane resizable so users can adjust the width of the Chat and Code
 - HTML/CSS changes: Placed a `.resizer` drag-handle div between the chat-pane and code-pane elements, and updated the CSS layout from display-grid to display-flex to support fluid width adjustments.
 - JS drag handle: Programmed `initResizer` in `app.js` with mousedown/mousemove/mouseup listeners. Dynamically recalculates the left panel's width on-drag with smooth boundaries (min 280px, max 75%).
 
+--------------------------------------------------------------------------------
+9. DYNAMIC UI COLOR THEME SELECTOR
+--------------------------------------------------------------------------------
+[Prompt]
+Enable trying multiple UI color schemes to find the most visually pleasing layout.
+
+[Response Summary]
+- CSS Variables mapping: Configured alternative color variable values under `body[data-theme]` attributes in `index.css` for: GitHub Dark (Steel Blue), Nord Frost (Icy Arctic), One Dark (Warm Charcoal), and Forest Hacker (Sage Emerald).
+- Theme dropdown selector: Inserted a styled `<select>` element (`#theme-select`) inside the sidebar in `index.html`.
+- LocalStorage persistence: Added `changeTheme` and `restoreSavedTheme` in `app.js` to change the theme dynamically on select change, save the selection in `localStorage`, and auto-restore the user's preference on reload.
+
+
 
 
