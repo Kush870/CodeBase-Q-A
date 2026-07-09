@@ -1,0 +1,2 @@
+Description:-i want this app to Point the app at a code folder or GitHub repository and ask where a feature is implemented; it returns file-grounded answers with the relevant file paths and snippets
+the project outcomes should be:- 1. Answer where-is-this-implemented questions with correct file references. 2. Index a real repository and stay grounded in actual code. 3. Add a feature that drafts a README section from the indexed codebase.

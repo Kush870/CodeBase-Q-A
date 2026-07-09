@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeBase Q&A - Grounded Code Assistant</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Prism.js Tomorrow Night Theme for Code Highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="teal-icon"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <h2>SourceInsight</h2>
+        </div>
+        <p class="subtitle">Local Codebase Q&A</p>
+      </div>
+
+      <!-- Config Status Banner -->
+      <div id="status-banner" class="status-card warning">
+        <div class="status-header">
+          <span class="indicator"></span>
+          <span>Checking API Status...</span>
+        </div>
+      </div>
+
+      <!-- Indexing Form -->
+      <div class="sidebar-section">
+        <h3>Index Repository</h3>
+        
+        <div class="tab-selectors-mini">
+          <button type="button" class="mini-tab active" onclick="switchRepoType('local')">Local Folder</button>
+          <button type="button" class="mini-tab" onclick="switchRepoType('github')">GitHub URL</button>
+        </div>
+
+        <form id="index-form" onsubmit="handleIndex(event)">
+          <div class="input-group">
+            <label id="path-label" for="repo-path">Local Absolute Path</label>
+            <input type="text" id="repo-path" placeholder="e.g. C:\Users\dell\Documents\project" required>
+          </div>
+          <button type="submit" id="index-btn" class="primary-btn">
+            <span>Index Codebase</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Stats Panel -->
+      <div id="stats-panel" class="sidebar-section hidden">
+        <h3>Current Index Status</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-val" id="stat-files">0</span>
+            <span class="stat-label">Files</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val" id="stat-lines">0</span>
+            <span class="stat-label">Lines</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val" id="stat-size">0 KB</span>
+            <span class="stat-label">Size</span>
+          </div>
+        </div>
+        <div class="repo-meta-name">
+          <strong>Repo:</strong> <span id="indexed-repo-name">None</span>
+        </div>
+      </div>
+
+      <!-- File Browser -->
+      <div class="sidebar-section flex-grow file-browser-section">
+        <h3>Codebase Files</h3>
+        <div class="search-files-box">
+          <input type="text" id="file-search-input" placeholder="Filter files..." oninput="filterFilesList()">
+        </div>
+        <div id="file-list-container" class="file-list-container">
+          <div class="empty-state">No repository indexed yet.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Tabs Bar -->
+      <header class="main-header">
+        <nav class="tabs-nav">
+          <button class="tab-link active" onclick="switchMainTab('qa-tab')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Code Q&A
+          </button>
+          <button class="tab-link" onclick="switchMainTab('readme-tab')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            README Draft
+          </button>
+          <button class="tab-link" id="code-viewer-tab-btn" onclick="switchMainTab('code-tab')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Code Viewer
+          </button>
+        </nav>
+      </header>
+
+      <!-- Tab Content: Q&A Chat -->
+      <section id="qa-tab" class="tab-content active">
+        <div class="chat-container">
+          <!-- Welcome/Intro -->
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-welcome">
+              <div class="welcome-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="teal-icon"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <h2>Ask Anything About Your Code</h2>
+              <p>Index your local codebase or a GitHub repository to ask questions. You'll get file-grounded answers backed by exact code references and snippets.</p>
+              
+              <div class="prompt-suggestions">
+                <h4>Suggested Questions:</h4>
+                <div class="suggestion-chips">
+                  <button class="chip" onclick="useSuggestedQuery('Where is the main entry point of the application and how is it initialized?')">Where is the entry point?</button>
+                  <button class="chip" onclick="useSuggestedQuery('List all available API endpoints or routing configurations.')">List all API endpoints</button>
+                  <button class="chip" onclick="useSuggestedQuery('How are environment variables and configurations loaded?')">How is config loaded?</button>
+                  <button class="chip" onclick="useSuggestedQuery('Are there any error handling or logging mechanisms? Explain them.')">Explain error handling</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input Box -->
+          <div class="chat-input-area">
+            <form id="chat-form" onsubmit="handleSendQuery(event)">
+              <textarea id="chat-input" placeholder="Ask where a feature is implemented or explain a file..." rows="2" required onkeydown="checkSubmit(event)"></textarea>
+              <button type="submit" id="send-btn" class="primary-btn icon-only">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Content: README Draft -->
+      <section id="readme-tab" class="tab-content">
+        <div class="readme-container">
+          <div class="readme-settings">
+            <h2>Draft a README Section</h2>
+            <p class="section-desc">Generate beautiful, accurate, context-aware README sections directly from your indexed codebase structure and files.</p>
+            
+            <form id="readme-form" onsubmit="handleGenerateReadme(event)">
+              <div class="form-row">
+                <div class="input-group">
+                  <label for="readme-section-select">README Section To Draft</label>
+                  <select id="readme-section-select" required>
+                    <option value="Complete README.md Details">Complete README Overview</option>
+                    <option value="Installation and Setup Instructions">Installation & Setup</option>
+                    <option value="Architecture and Directory Layout">Architecture & Folder Layout</option>
+                    <option value="Usage Guide & Core Workflows">Usage Guide</option>
+                    <option value="API Reference & Integrations">API Reference</option>
+                    <option value="Configuration & Environment Variables">Configuration & Env Settings</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="readme-instructions">Special Instructions (Optional)</label>
+                <textarea id="readme-instructions" placeholder="e.g. Include a detailed directory tree diagram, write in an encouraging tone, specify Python v3.11 requirements..." rows="3"></textarea>
+              </div>
+
+              <button type="submit" id="generate-readme-btn" class="primary-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span>Draft README Section</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="readme-preview">
+            <div class="preview-header">
+              <h3>Draft Preview</h3>
+              <button onclick="copyReadmeText()" id="copy-readme-btn" class="secondary-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy Markdown
+              </button>
+            </div>
+            <div class="preview-body">
+              <textarea id="readme-output" readonly placeholder="Your generated README section will appear here in Markdown..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Content: Code Viewer -->
+      <section id="code-tab" class="tab-content">
+        <div class="code-viewer-container">
+          <div class="code-viewer-header">
+            <div class="code-file-info">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="teal-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <h3 id="current-filename">Select a file from the explorer</h3>
+            </div>
+            <div class="code-file-path" id="current-filepath">No active file</div>
+          </div>
+          <div class="code-viewer-body">
+            <pre class="line-numbers"><code id="code-block" class="language-javascript">Select a file from the sidebar's Codebase Files tree to view its syntax-highlighted content.</code></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CDN Scripts for Prism.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

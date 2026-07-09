@@ -1,0 +1,65 @@
+================================================================================
+PROJECT HISTORY & ARCHITECTURAL LOG
+================================================================================
+
+This file contains the key development history, user instructions, and technical responses detailing the architectural decisions of this codebase. Read this file to instantly understand the context of the CodeBase Q&A project.
+
+--------------------------------------------------------------------------------
+1. PROJECT INITIALIZATION & GOALS
+--------------------------------------------------------------------------------
+[Prompt]
+Initialize a codebase Q&A application based on the goals defined in final_goal.txt:
+1. Answer code location queries with exact file references and line numbers.
+2. Index local folders and remote public GitHub repositories.
+3. Automatically draft README sections from the scanned codebase.
+
+[Response Summary]
+Designed and implemented a full-stack local web application:
+- Backend: Node.js + Express server to handle local scanning, git cloning, and Gemini API query construction.
+- Frontend: Single-page application using vanilla HTML, CSS, and Javascript.
+- Context Strategy: Fits repository content into Gemini's prompt context, accompanied by the directory file structure.
+
+--------------------------------------------------------------------------------
+2. REMOTE REPOSITORY COMPATIBILITY
+--------------------------------------------------------------------------------
+[Prompt]
+Clarify the repository indexing workflow for remote repositories: Will cloning a public GitHub URL result in the identical analysis and output formats as scanning a local directory?
+
+[Response Summary]
+Confirmed that remote GitHub links undergo a local `git clone` into a temporary directory (`temp_repos/`) on the server. Once cloned locally, the files are recursively scanned and queried using the exact same pipeline as local directories.
+
+--------------------------------------------------------------------------------
+3. API KEY SECURITY AND BACKEND STORAGE
+--------------------------------------------------------------------------------
+[Prompt]
+Secure the Gemini API key by storing it on the backend. The key must not be exposed to the client-side UI, nor must it be committed to version control. Set up a secure configuration environment.
+
+[Response Summary]
+Re-architected the key management system:
+- Removed API key inputs from the frontend.
+- Created a `.env` file at the project root for local backend storage.
+- Added `.env` and the `temp_repos/` directories to `.gitignore` to prevent any exposure on GitHub.
+- Exposed `/api/status` to let the frontend verify if the API key is configured on the backend.
+
+--------------------------------------------------------------------------------
+4. UI PALETTE AND AESTHETIC COMPLIANCE
+--------------------------------------------------------------------------------
+[Prompt]
+Apply a professional, clean, user-friendly design palette (slate, teal, and cyan) avoiding any purple colors in the interface. Enable local configuration of the API key in the `.env` template so it can be added later.
+
+[Response Summary]
+Developed a modern slate-dark user interface using CSS glassmorphism, rounded panels, and a strict slate/teal/cyan palette (completely removing all purple tones). Created the complete app files structure including Prism.js integration for syntax highlighting in the Code Viewer.
+
+--------------------------------------------------------------------------------
+5. API LOAD AND TOKEN OPTIMIZATION
+--------------------------------------------------------------------------------
+[Prompt]
+Optimize the application to reduce Gemini API load and manage token consumption. Implement API-request caching and limit context sizes.
+
+[Response Summary]
+Implemented four major backend API load optimizations:
+- Context Size Cap: Reduced the prompt code context limit from 1.2MB to 250KB.
+- Retrieval File Limit: Capped the maximum files sent in a single query prompt to the top 6 ranked files.
+- In-Memory Query Cache: Added `queryCache` Map to save and return identical query responses instantly.
+- README Draft Cache: Added `readmeCache` Map to optimize duplicate README generation runs.
+- All caches are cleared automatically when a new repository is indexed.
