@@ -110,6 +110,17 @@ Enable trying multiple UI color schemes to find the most visually pleasing layou
 - Theme dropdown selector: Inserted a styled `<select>` element (`#theme-select`) inside the sidebar in `index.html`.
 - LocalStorage persistence: Added `changeTheme` and `restoreSavedTheme` in `app.js` to change the theme dynamically on select change, save the selection in `localStorage`, and auto-restore the user's preference on reload.
 
+--------------------------------------------------------------------------------
+10. LIGHT THEMES ADDITION
+--------------------------------------------------------------------------------
+[Prompt]
+Suggest and implement light theme versions of the UI color schemes.
+
+[Response Summary]
+- Added options to HTML: Added "GitHub Light (Crisp White)" and "Nord Light (Arctic Snow)" options to `#theme-select` in `index.html`.
+- Added CSS variables: Appended `body[data-theme="github-light"]` and `body[data-theme="nord-light"]` style overrides in `index.css` using slate-grays/whites for GitHub Light and polar whites/blues for Nord Light.
+
+
 
 
 

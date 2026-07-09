@@ -1100,3 +1100,41 @@ body[data-theme="forest"] {
   --border-color: #1b2d24;
   --border-light: rgba(16, 185, 129, 0.04);
 }
+
+/* Theme: GitHub Light */
+body[data-theme="github-light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #eaeef2;
+  
+  --accent-teal: #1a7f37;
+  --accent-teal-hover: #115e29;
+  --accent-cyan: #0969da;
+  --accent-cyan-hover: #054f9f;
+  
+  --text-main: #24292f;
+  --text-muted: #57606a;
+  --text-dim: #8c959f;
+  
+  --border-color: #d0d7de;
+  --border-light: rgba(31, 35, 40, 0.06);
+}
+
+/* Theme: Nord Light */
+body[data-theme="nord-light"] {
+  --bg-primary: #eceff4;
+  --bg-secondary: #e5e9f0;
+  --bg-tertiary: #d8dee9;
+  
+  --accent-teal: #8fbcbb;
+  --accent-teal-hover: #5e81ac;
+  --accent-cyan: #5e81ac;
+  --accent-cyan-hover: #81a1c1;
+  
+  --text-main: #2e3440;
+  --text-muted: #4c566a;
+  --text-dim: #434c5e;
+  
+  --border-color: #ccd3de;
+  --border-light: rgba(46, 52, 64, 0.04);
+}
