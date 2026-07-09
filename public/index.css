@@ -2,28 +2,28 @@
    DESIGN SYSTEM & VARIABLES (Slate, Teal, and Cyan Palette)
    ========================================================================== */
 :root {
-  --bg-primary: #1e222b;
-  --bg-secondary: #21252b;
-  --bg-tertiary: #282c34;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #eaeef2;
   
-  --accent-teal: #98c379;
-  --accent-teal-hover: #a0c984;
-  --accent-cyan: #61afef;
-  --accent-cyan-hover: #76bcff;
+  --accent-teal: #1a7f37;
+  --accent-teal-hover: #115e29;
+  --accent-cyan: #0969da;
+  --accent-cyan-hover: #054f9f;
   
-  --text-main: #abb2bf;
-  --text-muted: #828997;
-  --text-dim: #5c6370;
+  --text-main: #24292f;
+  --text-muted: #57606a;
+  --text-dim: #8c959f;
   
-  --border-color: #3e4451;
-  --border-light: rgba(255, 255, 255, 0.04);
+  --border-color: #d0d7de;
+  --border-light: rgba(31, 35, 40, 0.08);
   
-  --glass-bg: rgba(15, 19, 34, 0.65);
+  --glass-bg: rgba(255, 255, 255, 0.5);
   --glass-blur: blur(12px);
   
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
+  --success: #1a7f37;
+  --warning: #bf8700;
+  --danger: #cf222e;
   
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'Fira Code', monospace;
@@ -1021,120 +1021,4 @@ input, textarea, select, button {
   border-left: 2px solid var(--accent-cyan);
 }
 
-/* ==========================================================================
-   THEME COLOR SCHEMES
-   ========================================================================== */
 
-/* Theme: GitHub Dark */
-body[data-theme="github-dark"] {
-  --bg-primary: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-tertiary: #21262d;
-  
-  --accent-teal: #2ea043;
-  --accent-teal-hover: #3fb950;
-  --accent-cyan: #58a6ff;
-  --accent-cyan-hover: #79c0ff;
-  
-  --text-main: #c9d1d9;
-  --text-muted: #8b949e;
-  --text-dim: #484f58;
-  
-  --border-color: #30363d;
-  --border-light: rgba(240, 246, 252, 0.05);
-}
-
-/* Theme: Nord Arctic Frost */
-body[data-theme="nord"] {
-  --bg-primary: #2e3440;
-  --bg-secondary: #3b4252;
-  --bg-tertiary: #434c5e;
-  
-  --accent-teal: #a3be8c;
-  --accent-teal-hover: #8fbcbb;
-  --accent-cyan: #88c0d0;
-  --accent-cyan-hover: #81a1c1;
-  
-  --text-main: #eceff4;
-  --text-muted: #d8dee9;
-  --text-dim: #4c566a;
-  
-  --border-color: #434c5e;
-  --border-light: rgba(255, 255, 255, 0.03);
-}
-
-/* Theme: One Dark */
-body[data-theme="one-dark"] {
-  --bg-primary: #1e222b;
-  --bg-secondary: #21252b;
-  --bg-tertiary: #282c34;
-  
-  --accent-teal: #98c379;
-  --accent-teal-hover: #a0c984;
-  --accent-cyan: #61afef;
-  --accent-cyan-hover: #76bcff;
-  
-  --text-main: #abb2bf;
-  --text-muted: #828997;
-  --text-dim: #5c6370;
-  
-  --border-color: #3e4451;
-  --border-light: rgba(255, 255, 255, 0.04);
-}
-
-/* Theme: Forest Hacker */
-body[data-theme="forest"] {
-  --bg-primary: #070a08;
-  --bg-secondary: #0f1411;
-  --bg-tertiary: #17201b;
-  
-  --accent-teal: #10b981;
-  --accent-teal-hover: #34d399;
-  --accent-cyan: #059669;
-  --accent-cyan-hover: #10b981;
-  
-  --text-main: #e2e8f0;
-  --text-muted: #8f9e96;
-  --text-dim: #38463f;
-  
-  --border-color: #1b2d24;
-  --border-light: rgba(16, 185, 129, 0.04);
-}
-
-/* Theme: GitHub Light */
-body[data-theme="github-light"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f6f8fa;
-  --bg-tertiary: #eaeef2;
-  
-  --accent-teal: #1a7f37;
-  --accent-teal-hover: #115e29;
-  --accent-cyan: #0969da;
-  --accent-cyan-hover: #054f9f;
-  
-  --text-main: #24292f;
-  --text-muted: #57606a;
-  --text-dim: #8c959f;
-  
-  --border-color: #d0d7de;
-  --border-light: rgba(31, 35, 40, 0.06);
-}
-
-/* Theme: Nord Light */
-body[data-theme="nord-light"] {
-  --bg-primary: #eceff4;
-  --bg-secondary: #e5e9f0;
-  --bg-tertiary: #d8dee9;
-  
-  --accent-teal: #8fbcbb;
-  --accent-teal-hover: #5e81ac;
-  --accent-cyan: #5e81ac;
-  --accent-cyan-hover: #81a1c1;
-  
-  --text-main: #2e3440;
-  --text-muted: #4c566a;
-  --text-dim: #434c5e;
-  
-  --border-color: #ccd3de;
-  --border-light: rgba(46, 52, 64, 0.04);
-}

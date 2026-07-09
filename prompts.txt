@@ -120,6 +120,18 @@ Suggest and implement light theme versions of the UI color schemes.
 - Added options to HTML: Added "GitHub Light (Crisp White)" and "Nord Light (Arctic Snow)" options to `#theme-select` in `index.html`.
 - Added CSS variables: Appended `body[data-theme="github-light"]` and `body[data-theme="nord-light"]` style overrides in `index.css` using slate-grays/whites for GitHub Light and polar whites/blues for Nord Light.
 
+--------------------------------------------------------------------------------
+11. PERMANENT GITHUB LIGHT THEME & SELECTOR REMOVAL
+--------------------------------------------------------------------------------
+[Prompt]
+Set GitHub Light as the permanent UI theme and remove the dropdown options selection bar.
+
+[Response Summary]
+- Set default CSS variables: Rewrote the `:root` variables inside `index.css` to directly use the GitHub Light color schema. Removed all alternative theme class styles.
+- Removed HTML element: Deleted the Theme Selector dropdown (`#theme-select` select menu container) from `index.html`.
+- Cleaned up JS scripts: Removed theme change and localstorage restoration helper function definitions (`changeTheme`, `restoreSavedTheme`) from `app.js`.
+
+
 
 
 

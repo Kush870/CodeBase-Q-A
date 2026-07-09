@@ -31,7 +31,6 @@ const codeBlock = document.getElementById('code-block');
 document.addEventListener('DOMContentLoaded', () => {
   resetCodebaseState();
   initResizer();
-  restoreSavedTheme();
 });
 
 // Reset codebase state on page reload
@@ -704,18 +703,4 @@ function initResizer() {
   });
 }
 
-// Change color theme dynamically
-function changeTheme(theme) {
-  document.body.setAttribute('data-theme', theme);
-  localStorage.setItem('ui-theme', theme);
-}
 
-// Restore saved color theme
-function restoreSavedTheme() {
-  const savedTheme = localStorage.getItem('ui-theme') || 'default';
-  document.body.setAttribute('data-theme', savedTheme);
-  const select = document.getElementById('theme-select');
-  if (select) {
-    select.value = savedTheme;
-  }
-}
