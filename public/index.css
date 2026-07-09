@@ -2,21 +2,21 @@
    DESIGN SYSTEM & VARIABLES (Slate, Teal, and Cyan Palette)
    ========================================================================== */
 :root {
-  --bg-primary: #070911;
-  --bg-secondary: #0f1322;
-  --bg-tertiary: #171d33;
+  --bg-primary: #2e3440;
+  --bg-secondary: #3b4252;
+  --bg-tertiary: #434c5e;
   
-  --accent-teal: #0d9488;
-  --accent-teal-hover: #14b8a6;
-  --accent-cyan: #0ea5e9;
-  --accent-cyan-hover: #38bdf8;
+  --accent-teal: #a3be8c;
+  --accent-teal-hover: #8fbcbb;
+  --accent-cyan: #88c0d0;
+  --accent-cyan-hover: #81a1c1;
   
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
+  --text-main: #eceff4;
+  --text-muted: #d8dee9;
+  --text-dim: #4c566a;
   
-  --border-color: #1e293b;
-  --border-light: rgba(255, 255, 255, 0.05);
+  --border-color: #434c5e;
+  --border-light: rgba(255, 255, 255, 0.03);
   
   --glass-bg: rgba(15, 19, 34, 0.65);
   --glass-blur: blur(12px);
