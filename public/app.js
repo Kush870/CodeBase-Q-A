@@ -30,6 +30,7 @@ const codeBlock = document.getElementById('code-block');
 // On Page Load
 document.addEventListener('DOMContentLoaded', () => {
   resetCodebaseState();
+  initResizer();
 });
 
 // Reset codebase state on page reload
@@ -657,5 +658,47 @@ function copyReadmeText() {
     setTimeout(() => {
       btn.innerHTML = originalText;
     }, 2000);
+  });
+}
+
+// Initialize the draggable resizer for split panels
+function initResizer() {
+  const resizer = document.getElementById('resizer');
+  const chatPane = document.getElementById('chat-pane');
+  
+  if (!resizer || !chatPane) return;
+  
+  const workspace = chatPane.parentElement;
+  let isDragging = false;
+
+  resizer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    resizer.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    
+    const workspaceRect = workspace.getBoundingClientRect();
+    const newWidth = e.clientX - workspaceRect.left;
+    
+    // Bounds constraints
+    const minWidth = 280;
+    const maxWidth = workspaceRect.width * 0.75;
+    
+    if (newWidth >= minWidth && newWidth <= maxWidth) {
+      chatPane.style.width = `${newWidth}px`;
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      resizer.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
   });
 }

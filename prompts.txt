@@ -89,4 +89,15 @@ Enhance the visual design and usability of the interface:
 - Marked.js integration: Loaded Marked CDN and integrated `marked.parse()` to render professional markdown outputs in chat.
 - Glowing lines scroll: Added parameter scanning for lines (`#L45-L60`) in badge click handlers. Programmed `loadFileInViewer` to apply a glowing cyan line highlight class (`.highlighted-line-num`) to the active ranges and scroll the pre tag smoothly to focus.
 
+--------------------------------------------------------------------------------
+8. DRAGGABLE SPLIT PANE RESIZER
+--------------------------------------------------------------------------------
+[Prompt]
+Make the split pane resizable so users can adjust the width of the Chat and Code Viewer panels.
+
+[Response Summary]
+- HTML/CSS changes: Placed a `.resizer` drag-handle div between the chat-pane and code-pane elements, and updated the CSS layout from display-grid to display-flex to support fluid width adjustments.
+- JS drag handle: Programmed `initResizer` in `app.js` with mousedown/mousemove/mouseup listeners. Dynamically recalculates the left panel's width on-drag with smooth boundaries (min 280px, max 75%).
+
+
 

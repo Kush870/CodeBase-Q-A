@@ -517,20 +517,23 @@ input, textarea, select, button {
    SPLIT-PANE WORKSPACE LAYOUT
    ========================================================================== */
 .workspace-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.25fr;
+  display: flex;
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 .chat-pane {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-right: 1px solid var(--border-color);
+  width: 45%; /* default start width */
+  min-width: 250px;
+  max-width: 75%;
   background-color: rgba(15, 19, 34, 0.25);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .code-pane {
@@ -539,6 +542,24 @@ input, textarea, select, button {
   height: 100%;
   background-color: #060910;
   overflow: hidden;
+  flex: 1; /* takes remaining width */
+  min-width: 250px;
+}
+
+/* Draggable resizer bar */
+.resizer {
+  width: 5px;
+  background-color: var(--border-color);
+  cursor: col-resize;
+  align-self: stretch;
+  flex-shrink: 0;
+  transition: background-color 0.25s ease;
+  z-index: 10;
+  position: relative;
+}
+
+.resizer:hover, .resizer.dragging {
+  background-color: var(--accent-cyan);
 }
 
 /* ==========================================================================

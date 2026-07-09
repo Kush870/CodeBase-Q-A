@@ -105,7 +105,7 @@
       <section id="qa-tab" class="tab-content active">
         <div class="workspace-layout">
           <!-- Left Split: Q&A Chat -->
-          <div class="chat-pane">
+          <div class="chat-pane" id="chat-pane">
             <div class="chat-container">
               <!-- Welcome/Intro -->
               <div class="chat-messages" id="chat-messages">
@@ -140,8 +140,11 @@
             </div>
           </div>
 
+          <!-- Drag Resizer Bar -->
+          <div class="resizer" id="resizer"></div>
+
           <!-- Right Split: Code Viewer -->
-          <div class="code-pane">
+          <div class="code-pane" id="code-pane">
             <div class="code-viewer-container">
               <div class="code-viewer-header">
                 <div class="code-file-info">
