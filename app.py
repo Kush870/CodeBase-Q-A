@@ -96,6 +96,25 @@ st.markdown("""
         cursor: pointer !important;
     }
     
+    
+    /* Style only secondary buttons in the sidebar (which are the file tree nodes) */
+    div[data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+        background-color: transparent !important;
+        border: none !important;
+        color: var(--text-main) !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+        padding: 4px 8px !important;
+        font-size: 0.8rem !important;
+        font-family: monospace !important;
+        box-shadow: none !important;
+        margin-bottom: 2px !important;
+    }
+    div[data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+        background-color: var(--bg-secondary) !important;
+        color: var(--accent-cyan) !important;
+    }
+    
     /* Code block customizations */
     pre code {
         font-family: 'Fira Code', monospace !important;
@@ -189,6 +208,40 @@ def scan_directory(dir_path):
                     print(f"Skipping {rel_path} due to error: {e}")
                     
     return files_list
+
+def build_tree_dict(paths_list):
+    tree = {"files": [], "dirs": {}}
+    for path in paths_list:
+        path_parts = path.split('/')
+        current_node = tree
+        for part in path_parts[:-1]:
+            if part not in current_node["dirs"]:
+                current_node["dirs"][part] = {"files": [], "dirs": {}}
+            current_node = current_node["dirs"][part]
+        current_node["files"].append(path_parts[-1])
+    return tree
+
+def render_tree(node, current_path=""):
+    for file in sorted(node["files"]):
+        rel_file_path = (os.path.join(current_path, file) if current_path else file).replace('\\', '/')
+        is_active = (st.session_state.active_file == rel_file_path)
+        label = f"👉 📄 {file}" if is_active else f"📄 {file}"
+        
+        # Secondary button representing a file
+        if st.button(label, key=f"tree-file-{rel_file_path}", use_container_width=True):
+            st.session_state.active_file = rel_file_path
+            st.rerun()
+            
+    for dir_name, sub_node in sorted(node["dirs"].items()):
+        rel_dir_path = (os.path.join(current_path, dir_name) if current_path else dir_name).replace('\\', '/')
+        
+        # Auto-expand subdirectory if it holds the active file
+        is_expanded = False
+        if st.session_state.active_file:
+            is_expanded = st.session_state.active_file.startswith(rel_dir_path + "/") or st.session_state.active_file == rel_dir_path
+            
+        with st.expander(f"📁 {dir_name}", expanded=is_expanded):
+            render_tree(sub_node, rel_dir_path)
 
 def clone_and_scan_github(github_url):
     clean_url = github_url.strip().replace('.git', '')
@@ -331,7 +384,7 @@ with st.sidebar:
     else:
         repo_path = st.text_input("GitHub URL", placeholder="e.g. https://github.com/owner/repo")
         
-    if st.button("Index Codebase", use_container_width=True):
+    if st.button("Index Codebase", type="primary", use_container_width=True):
         if not is_api_ready:
             st.error("Cannot index: GEMINI_API_KEY is not configured.")
         else:
@@ -362,14 +415,9 @@ with st.sidebar:
         filtered_paths = [p for p in file_paths if search_query.lower() in p.lower()] if search_query else file_paths
         
         if filtered_paths:
-            # Determine correct index for active file to keep sidebar selectbox in sync
-            default_idx = 0
-            if st.session_state.active_file in filtered_paths:
-                default_idx = filtered_paths.index(st.session_state.active_file)
-                
-            selected = st.selectbox("Select file to view:", options=filtered_paths, index=default_idx)
-            if selected:
-                st.session_state.active_file = selected
+            # Build and render the nested file tree
+            tree_dict = build_tree_dict(filtered_paths)
+            render_tree(tree_dict)
         else:
             st.caption("No matching files found.")
 
