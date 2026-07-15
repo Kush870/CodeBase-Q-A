@@ -3,5 +3,11 @@ node_modules/
 temp_repos/
 *.log
 internship_report.docx
-internship_report.md 
-final_goal.txt 
+internship_report.md
+final_goal.txt
+__pycache__/
+*.py[cod]
+*$py.class
+.streamlit/
+.chroma/
+.ipynb_checkpoints/

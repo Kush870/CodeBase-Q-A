@@ -131,8 +131,14 @@ Set GitHub Light as the permanent UI theme and remove the dropdown options selec
 - Removed HTML element: Deleted the Theme Selector dropdown (`#theme-select` select menu container) from `index.html`.
 - Cleaned up JS scripts: Removed theme change and localstorage restoration helper function definitions (`changeTheme`, `restoreSavedTheme`) from `app.js`.
 
+--------------------------------------------------------------------------------
+12. PYTHON, STREAMLIT, & LANGCHAIN MIGRATION
+--------------------------------------------------------------------------------
+[Prompt]
+Rewrite the codebase analyzer into a Python Streamlit application integrated with LangChain, Gemini Embeddings, and an in-memory vector store.
 
-
-
-
-
+[Response Summary]
+- Shifted to Python runtime: Replaced the Express.js and HTML/CSS/JS frontend with a unified Streamlit web application (`app.py`) and standard dependencies manifest (`requirements.txt`).
+- Semantic Indexing (LangChain + FAISS): Integrated `RecursiveCharacterTextSplitter` and `GoogleGenerativeAIEmbeddings` with an in-memory `FAISS` Vector Store to chunk, embed, and search codebases locally.
+- Grounded Q&A Chat: Replaced keyword indexing with LangChain similarity searches, pulling the top 5 relevant code chunks into Gemini API context for grounded answering.
+- Cleaned Node.js assets: Deleted all Node.js source files (`server.js`, `package.json`, `package-lock.json`, `public/` directory, `node_modules/`, and `test_server.js`).
