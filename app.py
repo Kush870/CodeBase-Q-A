@@ -3,6 +3,7 @@ import re
 import tempfile
 import subprocess
 import shutil
+import time
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -151,6 +152,8 @@ if 'indexed_files' not in st.session_state:
     st.session_state.indexed_files = []  # List of dicts: {path, content, size, lines}
 if 'vector_store' not in st.session_state:
     st.session_state.vector_store = None
+if 'tfidf_retriever' not in st.session_state:
+    st.session_state.tfidf_retriever = None
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 if 'stats' not in st.session_state:
@@ -161,6 +164,10 @@ if 'active_file' not in st.session_state:
     st.session_state.active_file = None
 if 'readme_draft' not in st.session_state:
     st.session_state.readme_draft = ""
+if 'retriever_type' not in st.session_state:
+    st.session_state.retriever_type = "semantic"
+if 'indexing_warning' not in st.session_state:
+    st.session_state.indexing_warning = None
 
 # --------------------------------------------------------------------------
 # HELPER BACKEND FUNCTIONS (Recursive Scan, Clone, Indexing)
@@ -306,43 +313,78 @@ def index_codebase(target_path, repo_type, api_key):
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
             split_docs = text_splitter.split_documents(lc_docs)
             
-            # Generate Embeddings & load FAISS index
-            embeddings = GoogleGenerativeAIEmbeddings(
-                model="models/gemini-embedding-001",
-                google_api_key=api_key
-            )
-            
-            # Index in sleep-delayed batches to avoid Free Tier Rate Limits (RESOURCE_EXHAUSTED)
-            import time
-            batch_size = 20
-            vector_store = None
-            
-            # Initialize progress bar for semantic indexing
-            progress_bar = st.progress(0.0, text="Preparing chunks...")
+            # --- Semantic Embedding with Auto-Retry + TF-IDF Fallback ---
+            progress_bar = st.progress(0.0, text="Preparing index...")
             total_chunks = len(split_docs)
             
-            for i in range(0, total_chunks, batch_size):
-                batch = split_docs[i:i+batch_size]
-                if vector_store is None:
-                    vector_store = FAISS.from_documents(batch, embeddings)
-                else:
-                    vector_store.add_documents(batch)
+            try:
+                embeddings = GoogleGenerativeAIEmbeddings(
+                    model="models/gemini-embedding-001",
+                    google_api_key=api_key
+                )
                 
-                # Update progress
-                progress_percent = min(1.0, (i + len(batch)) / total_chunks)
-                progress_bar.progress(progress_percent, text=f"Embedded {min(total_chunks, i + len(batch))}/{total_chunks} chunks...")
+                batch_size = 5  # Small batches to stay safely under free-tier rate limits
+                vector_store = None
+                max_retries = 5
+                i = 0
                 
-                # Add delay to stay under the 100 requests/min rate limit
-                if i + batch_size < total_chunks:
-                    time.sleep(1.5)
+                while i < total_chunks:
+                    batch = split_docs[i:i+batch_size]
+                    
+                    for attempt in range(max_retries):
+                        try:
+                            if vector_store is None:
+                                vector_store = FAISS.from_documents(batch, embeddings)
+                            else:
+                                vector_store.add_documents(batch)
+                            break  # Batch succeeded
+                        except Exception as embed_err:
+                            err_str = str(embed_err)
+                            if '429' in err_str or 'RESOURCE_EXHAUSTED' in err_str:
+                                if attempt >= max_retries - 1:
+                                    raise  # All retries exhausted -> fall to TF-IDF
+                                # Exponential backoff with server-suggested delay
+                                wait_time = min(90, (2 ** attempt) * 10)
+                                delay_match = re.search(r'retry in (\d+\.?\d*)s', err_str, re.IGNORECASE)
+                                if delay_match:
+                                    wait_time = max(wait_time, float(delay_match.group(1)) + 5)
+                                progress_bar.progress(
+                                    min(0.99, i / max(total_chunks, 1)),
+                                    text=f"Rate limited - waiting {wait_time:.0f}s (retry {attempt+1}/{max_retries})..."
+                                )
+                                time.sleep(wait_time)
+                            else:
+                                raise  # Non-rate-limit error -> propagate
+                    
+                    done = min(total_chunks, i + len(batch))
+                    progress_bar.progress(done / total_chunks, text=f"Embedded {done}/{total_chunks} chunks...")
+                    i += batch_size
+                    
+                    # Throttle: 5 reqs per 4s = ~75 req/min (safely under 100/min limit)
+                    if i < total_chunks:
+                        time.sleep(4)
+                
+                st.session_state.vector_store = vector_store
+                st.session_state.tfidf_retriever = None
+                st.session_state.retriever_type = "semantic"
+                
+            except Exception as embed_error:
+                # Quota fully exhausted -> fall back to TF-IDF (zero API calls needed)
+                progress_bar.progress(0.5, text="Falling back to keyword search...")
+                from langchain_community.retrievers import TFIDFRetriever
+                tfidf = TFIDFRetriever.from_documents(split_docs, k=5)
+                st.session_state.tfidf_retriever = tfidf
+                st.session_state.vector_store = None
+                st.session_state.retriever_type = "keyword"
+                st.warning(f"Embedding quota exceeded. Using keyword search instead.")
             
             progress_bar.empty()
-            st.session_state.vector_store = vector_store
             
             # Clear chat history for the new codebase index
             st.session_state.chat_history = []
             st.session_state.active_file = files[0]['path'] if files else None
-            st.success(f"Successfully indexed {name}! Loaded {len(files)} files.")
+            mode_label = "Semantic (FAISS)" if st.session_state.retriever_type == "semantic" else "Keyword (TF-IDF)"
+            st.success(f"Indexed {name}! {len(files)} files loaded. Search mode: {mode_label}")
             
         except Exception as e:
             st.error(f"Failed to index codebase: {e}")
@@ -563,10 +605,16 @@ with tab1:
             if user_query:
                 st.session_state.chat_history.append({"role": "user", "content": user_query})
                 
-                with st.spinner("Analyzing vector embeddings and query matches..."):
+                with st.spinner("Searching codebase..."):
                     try:
-                        # Retrieve documents from LangChain Vector Store
-                        retrieved_docs = st.session_state.vector_store.similarity_search(user_query, k=5)
+                        # Retrieve documents using the available retriever
+                        if st.session_state.vector_store:
+                            retrieved_docs = st.session_state.vector_store.similarity_search(user_query, k=5)
+                        elif st.session_state.tfidf_retriever:
+                            retrieved_docs = st.session_state.tfidf_retriever.invoke(user_query)
+                        else:
+                            st.error("No search index available. Please re-index the codebase.")
+                            st.stop()
                         
                         # Build context prompt
                         context_txt = ""
