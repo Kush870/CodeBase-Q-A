@@ -5,9 +5,10 @@ temp_repos/
 internship_report.docx
 internship_report.md
 final_goal.txt
+prompts.txt
 __pycache__/
 *.py[cod]
 *$py.class
-.streamlit/
+.streamlit/secrets.toml
 .chroma/
 .ipynb_checkpoints/
