@@ -1,144 +1,344 @@
 ================================================================================
-PROJECT HISTORY & ARCHITECTURAL LOG
+PROJECT DEVELOPMENT LOG — SourceInsight (CodeBase Q&A)
 ================================================================================
 
-This file contains the key development history, user instructions, and technical responses detailing the architectural decisions of this codebase. Read this file to instantly understand the context of the CodeBase Q&A project.
+This document chronicles the full architectural evolution of the SourceInsight
+codebase analyzer. Each entry records the development prompt, the technical
+decisions made, and the implementation outcomes across 17 iterative stages.
+
+================================================================================
+
 
 --------------------------------------------------------------------------------
 1. PROJECT INITIALIZATION & GOALS
 --------------------------------------------------------------------------------
 [Prompt]
-Initialize a codebase Q&A application based on the goals defined in final_goal.txt:
-1. Answer code location queries with exact file references and line numbers.
-2. Index local folders and remote public GitHub repositories.
-3. Automatically draft README sections from the scanned codebase.
+Design and implement a codebase Q&A application capable of answering developer
+questions about any repository with exact file references and line numbers.
+The system must support indexing both local directories and remote public GitHub
+repositories. Additionally, provide functionality to auto-generate professional
+README sections from the scanned codebase content.
 
 [Response Summary]
 Designed and implemented a full-stack local web application:
-- Backend: Node.js + Express server to handle local scanning, git cloning, and Gemini API query construction.
-- Frontend: Single-page application using vanilla HTML, CSS, and Javascript.
-- Context Strategy: Fits repository content into Gemini's prompt context, accompanied by the directory file structure.
+- Backend: Node.js + Express server handling recursive file scanning, temporary
+  git cloning, and Gemini API prompt construction.
+- Frontend: Single-page application using vanilla HTML, CSS, and JavaScript.
+- Context Strategy: Fits repository content into Gemini's prompt context window,
+  accompanied by the full directory file structure for spatial awareness.
+
 
 --------------------------------------------------------------------------------
 2. REMOTE REPOSITORY COMPATIBILITY
 --------------------------------------------------------------------------------
 [Prompt]
-Clarify the repository indexing workflow for remote repositories: Will cloning a public GitHub URL result in the identical analysis and output formats as scanning a local directory?
+Ensure the repository indexing pipeline produces identical analysis and output
+formats regardless of whether the input source is a local directory path or a
+remote public GitHub URL.
 
 [Response Summary]
-Confirmed that remote GitHub links undergo a local `git clone` into a temporary directory (`temp_repos/`) on the server. Once cloned locally, the files are recursively scanned and queried using the exact same pipeline as local directories.
+Confirmed uniform pipeline behavior: Remote GitHub URLs undergo a local
+`git clone` into a temporary directory (`temp_repos/`) on the server. Once
+cloned, files are recursively scanned and queried using the exact same
+processing pipeline as local directories, ensuring output parity.
+
 
 --------------------------------------------------------------------------------
-3. API KEY SECURITY AND BACKEND STORAGE
+3. API KEY SECURITY & BACKEND STORAGE
 --------------------------------------------------------------------------------
 [Prompt]
-Secure the Gemini API key by storing it on the backend. The key must not be exposed to the client-side UI, nor must it be committed to version control. Set up a secure configuration environment.
+Secure the Gemini API key by storing it exclusively on the backend. The key must
+never be exposed to the client-side UI or committed to version control. Set up a
+secure environment configuration system.
 
 [Response Summary]
-Re-architected the key management system:
-- Removed API key inputs from the frontend.
-- Created a `.env` file at the project root for local backend storage.
-- Added `.env` and the `temp_repos/` directories to `.gitignore` to prevent any exposure on GitHub.
-- Exposed `/api/status` to let the frontend verify if the API key is configured on the backend.
+Re-architected the key management layer:
+- Removed all API key input fields from the frontend interface.
+- Created a `.env` file at the project root for backend-only storage.
+- Added `.env` and `temp_repos/` to `.gitignore` to prevent repository exposure.
+- Exposed a `/api/status` endpoint to allow the frontend to verify API key
+  configuration status without transmitting the key itself.
+
 
 --------------------------------------------------------------------------------
-4. UI PALETTE AND AESTHETIC COMPLIANCE
+4. UI PALETTE & AESTHETIC COMPLIANCE
 --------------------------------------------------------------------------------
 [Prompt]
-Apply a professional, clean, user-friendly design palette (slate, teal, and cyan) avoiding any purple colors in the interface. Enable local configuration of the API key in the `.env` template so it can be added later.
+Apply a professional, clean, developer-friendly design palette using slate, teal,
+and cyan tones. Eliminate all purple-toned colors from the interface. Enable
+local configuration of the API key through a `.env` template.
 
 [Response Summary]
-Developed a modern slate-dark user interface using CSS glassmorphism, rounded panels, and a strict slate/teal/cyan palette (completely removing all purple tones). Created the complete app files structure including Prism.js integration for syntax highlighting in the Code Viewer.
+Developed a modern slate-dark user interface featuring CSS glassmorphism, rounded
+panels, and a strict slate/teal/cyan palette. Integrated Prism.js for syntax
+highlighting in the Code Viewer. Created the complete frontend asset structure.
+
 
 --------------------------------------------------------------------------------
-5. API LOAD AND TOKEN OPTIMIZATION
+5. API LOAD & TOKEN OPTIMIZATION
 --------------------------------------------------------------------------------
 [Prompt]
-Optimize the application to reduce Gemini API load and manage token consumption. Implement API-request caching and limit context sizes.
+Optimize the application to reduce Gemini API token consumption and minimize
+redundant API calls. Implement request caching and enforce context size limits.
 
 [Response Summary]
-Implemented four major backend API load optimizations:
-- Context Size Cap: Reduced the prompt code context limit from 1.2MB to 250KB.
-- Retrieval File Limit: Capped the maximum files sent in a single query prompt to the top 6 ranked files.
-- In-Memory Query Cache: Added `queryCache` Map to save and return identical query responses instantly.
-- README Draft Cache: Added `readmeCache` Map to optimize duplicate README generation runs.
+Implemented four backend API load optimizations:
+- Context Size Cap: Reduced prompt code context limit from 1.2MB to 250KB.
+- Retrieval File Limit: Capped maximum files per query prompt to the top 6
+  ranked files by relevance.
+- In-Memory Query Cache: Added a `queryCache` Map to store and return identical
+  query responses instantly.
+- README Draft Cache: Added a `readmeCache` Map to optimize duplicate README
+  generation runs.
 - All caches are cleared automatically when a new repository is indexed.
+
 
 --------------------------------------------------------------------------------
 6. CACHE RESET ON REFRESH & IN-VIEWER FILE EXPLORER
 --------------------------------------------------------------------------------
 [Prompt]
-Clear the indexed codebase files and statistics from the UI on browser refresh. In the Code Viewer tab, implement a file selection dropdown so users can open and switch between any indexed file directly within the viewer.
+Clear the indexed codebase files and statistics from the UI on browser refresh.
+In the Code Viewer tab, implement a file selection dropdown so users can browse
+and switch between any indexed file directly within the viewer.
 
 [Response Summary]
-- In-Viewer File Selection: Replaced the static header in the Code Viewer with a styled `<select>` dropdown (`.viewer-select`). Populated the dropdown dynamically with all indexed files upon successful scanning, enabling quick file switching inside the viewer tab.
+- In-Viewer File Selection: Replaced the static Code Viewer header with a styled
+  `<select>` dropdown (`.viewer-select`), populated dynamically with all indexed
+  files upon successful scanning, enabling instant file switching.
+
 
 --------------------------------------------------------------------------------
 7. WORKSPACE LAYOUT & DIRECTORY TREE DESIGN SYSTEM
 --------------------------------------------------------------------------------
 [Prompt]
-Enhance the visual design and usability of the interface:
-1. Split Pane Workspace: Combine Chat and Code Viewer side-by-side inside a single Q&A Workspace tab. When file reference badges are clicked, the code opens on the right side instantly without losing chat context.
-2. Nested Folder Tree: Replace the flat list of files with a collapsible/expandable nested folder directory structure tree.
-3. Marked.js Markdown rendering: Add Marked.js parsing to format headers, lists, code snippets, and tables natively.
-4. Glowing Line Range Highlights: Support highlighting specific lines in the viewer and scrolling them smoothly into view when clicked from code reference tags.
+Enhance the visual design and usability of the interface with four improvements:
+1. Split Pane Workspace: Combine Chat and Code Viewer side-by-side inside a
+   single Q&A Workspace tab. Clicking file reference badges should open code on
+   the right side without losing chat context.
+2. Nested Folder Tree: Replace the flat file list with a collapsible/expandable
+   nested directory structure tree.
+3. Marked.js Markdown Rendering: Add Marked.js parsing for headers, lists, code
+   snippets, and tables in chat responses.
+4. Glowing Line Range Highlights: Support highlighting specific line ranges in
+   the viewer and scrolling them smoothly into view from code reference tags.
 
 [Response Summary]
-- Workspace split layout: Re-structured `index.html` and `index.css` to group Chat panel (left) and Code Viewer (right) side-by-side, creating a productive IDE-like split screen.
-- Directory Tree View: Implemented recursive tree parsing (`buildFileTree`, `renderTree`) in `app.js` with toggleable expand states and styled directory icons. Supports flat fallback listing during search filters.
-- Marked.js integration: Loaded Marked CDN and integrated `marked.parse()` to render professional markdown outputs in chat.
-- Glowing lines scroll: Added parameter scanning for lines (`#L45-L60`) in badge click handlers. Programmed `loadFileInViewer` to apply a glowing cyan line highlight class (`.highlighted-line-num`) to the active ranges and scroll the pre tag smoothly to focus.
+- Workspace Split Layout: Restructured `index.html` and `index.css` to group
+  Chat (left) and Code Viewer (right) side-by-side in a productive IDE-like
+  split-screen arrangement.
+- Directory Tree View: Implemented recursive tree parsing (`buildFileTree`,
+  `renderTree`) in `app.js` with toggleable expand/collapse states and styled
+  directory icons. Supports flat fallback listing during search filtering.
+- Marked.js Integration: Loaded Marked CDN and integrated `marked.parse()` to
+  render professional markdown outputs in the chat panel.
+- Glowing Line Scroll: Added parameter scanning for line ranges (`#L45-L60`) in
+  badge click handlers. Programmed `loadFileInViewer` to apply a glowing cyan
+  highlight class to active ranges and smooth-scroll the pre tag to focus.
+
 
 --------------------------------------------------------------------------------
 8. DRAGGABLE SPLIT PANE RESIZER
 --------------------------------------------------------------------------------
 [Prompt]
-Make the split pane resizable so users can adjust the width of the Chat and Code Viewer panels.
+Make the workspace split pane resizable so users can adjust the width ratio
+between the Chat and Code Viewer panels via mouse dragging.
 
 [Response Summary]
-- HTML/CSS changes: Placed a `.resizer` drag-handle div between the chat-pane and code-pane elements, and updated the CSS layout from display-grid to display-flex to support fluid width adjustments.
-- JS drag handle: Programmed `initResizer` in `app.js` with mousedown/mousemove/mouseup listeners. Dynamically recalculates the left panel's width on-drag with smooth boundaries (min 280px, max 75%).
+- HTML/CSS Changes: Placed a `.resizer` drag-handle div between the chat-pane
+  and code-pane elements. Updated the CSS layout from display-grid to
+  display-flex to support fluid width adjustments.
+- JavaScript Drag Handle: Programmed `initResizer` in `app.js` with
+  mousedown/mousemove/mouseup listeners. Dynamically recalculates the left
+  panel width on drag with smooth boundaries (min 280px, max 75%).
+
 
 --------------------------------------------------------------------------------
 9. DYNAMIC UI COLOR THEME SELECTOR
 --------------------------------------------------------------------------------
 [Prompt]
-Enable trying multiple UI color schemes to find the most visually pleasing layout.
+Enable multiple UI color schemes so users can select their preferred visual
+layout from a set of curated themes.
 
 [Response Summary]
-- CSS Variables mapping: Configured alternative color variable values under `body[data-theme]` attributes in `index.css` for: GitHub Dark (Steel Blue), Nord Frost (Icy Arctic), One Dark (Warm Charcoal), and Forest Hacker (Sage Emerald).
-- Theme dropdown selector: Inserted a styled `<select>` element (`#theme-select`) inside the sidebar in `index.html`.
-- LocalStorage persistence: Added `changeTheme` and `restoreSavedTheme` in `app.js` to change the theme dynamically on select change, save the selection in `localStorage`, and auto-restore the user's preference on reload.
+- CSS Variables Mapping: Configured alternative color variable values under
+  `body[data-theme]` attributes in `index.css` for four themes: GitHub Dark
+  (Steel Blue), Nord Frost (Icy Arctic), One Dark (Warm Charcoal), and Forest
+  Hacker (Sage Emerald).
+- Theme Dropdown Selector: Inserted a styled `<select>` element (`#theme-select`)
+  inside the sidebar in `index.html`.
+- LocalStorage Persistence: Added `changeTheme` and `restoreSavedTheme` in
+  `app.js` to change themes dynamically, save the selection in `localStorage`,
+  and auto-restore the user's preference on page reload.
+
 
 --------------------------------------------------------------------------------
 10. LIGHT THEMES ADDITION
 --------------------------------------------------------------------------------
 [Prompt]
-Suggest and implement light theme versions of the UI color schemes.
+Design and implement light theme variants of the existing UI color schemes.
 
 [Response Summary]
-- Added options to HTML: Added "GitHub Light (Crisp White)" and "Nord Light (Arctic Snow)" options to `#theme-select` in `index.html`.
-- Added CSS variables: Appended `body[data-theme="github-light"]` and `body[data-theme="nord-light"]` style overrides in `index.css` using slate-grays/whites for GitHub Light and polar whites/blues for Nord Light.
+- Added two options to the HTML theme selector: "GitHub Light (Crisp White)" and
+  "Nord Light (Arctic Snow)".
+- Appended `body[data-theme="github-light"]` and `body[data-theme="nord-light"]`
+  style overrides in `index.css`, using slate-grays/whites for GitHub Light and
+  polar whites/blues for Nord Light.
+
 
 --------------------------------------------------------------------------------
 11. PERMANENT GITHUB LIGHT THEME & SELECTOR REMOVAL
 --------------------------------------------------------------------------------
 [Prompt]
-Set GitHub Light as the permanent UI theme and remove the dropdown options selection bar.
+Commit to GitHub Light as the permanent UI theme. Remove the theme dropdown
+selector and all alternative theme definitions to simplify the codebase.
 
 [Response Summary]
-- Set default CSS variables: Rewrote the `:root` variables inside `index.css` to directly use the GitHub Light color schema. Removed all alternative theme class styles.
-- Removed HTML element: Deleted the Theme Selector dropdown (`#theme-select` select menu container) from `index.html`.
-- Cleaned up JS scripts: Removed theme change and localstorage restoration helper function definitions (`changeTheme`, `restoreSavedTheme`) from `app.js`.
+- Set Default CSS Variables: Rewrote `:root` variables in `index.css` to
+  directly use the GitHub Light color schema. Removed all alternative theme
+  class styles.
+- Removed HTML Element: Deleted the Theme Selector dropdown (`#theme-select`
+  container) from `index.html`.
+- Cleaned JS Scripts: Removed theme change and localStorage restoration
+  helpers (`changeTheme`, `restoreSavedTheme`) from `app.js`.
+
 
 --------------------------------------------------------------------------------
 12. PYTHON, STREAMLIT, & LANGCHAIN MIGRATION
 --------------------------------------------------------------------------------
 [Prompt]
-Rewrite the codebase analyzer into a Python Streamlit application integrated with LangChain, Gemini Embeddings, and an in-memory vector store.
+Rewrite the entire codebase analyzer from a Node.js/Express full-stack
+application into a Python Streamlit application integrated with LangChain,
+Google Gemini Embeddings, and an in-memory FAISS vector store for semantic
+retrieval-augmented generation (RAG).
 
 [Response Summary]
-- Shifted to Python runtime: Replaced the Express.js and HTML/CSS/JS frontend with a unified Streamlit web application (`app.py`) and standard dependencies manifest (`requirements.txt`).
-- Semantic Indexing (LangChain + FAISS): Integrated `RecursiveCharacterTextSplitter` and `GoogleGenerativeAIEmbeddings` with an in-memory `FAISS` Vector Store to chunk, embed, and search codebases locally.
-- Grounded Q&A Chat: Replaced keyword indexing with LangChain similarity searches, pulling the top 5 relevant code chunks into Gemini API context for grounded answering.
-- Cleaned Node.js assets: Deleted all Node.js source files (`server.js`, `package.json`, `package-lock.json`, `public/` directory, `node_modules/`, and `test_server.js`).
+- Shifted to Python Runtime: Replaced the Express.js backend and HTML/CSS/JS
+  frontend with a unified Streamlit web application (`app.py`) and a standard
+  Python dependencies manifest (`requirements.txt`).
+- Semantic Indexing (LangChain + FAISS): Integrated
+  `RecursiveCharacterTextSplitter` and `GoogleGenerativeAIEmbeddings` with an
+  in-memory `FAISS` Vector Store to chunk, embed, and search codebases.
+- Grounded Q&A Chat: Replaced keyword-based indexing with LangChain
+  `similarity_search`, pulling the top 5 relevant code chunks into Gemini API
+  context for grounded, citation-backed answering.
+- Cleaned Node.js Assets: Deleted all Node.js source files (`server.js`,
+  `package.json`, `package-lock.json`, `public/` directory, `node_modules/`,
+  and `test_server.js`).
+
+
+--------------------------------------------------------------------------------
+13. EMBEDDING MODEL FIX & STREAMLIT API COMPATIBILITY
+--------------------------------------------------------------------------------
+[Prompt]
+Resolve multiple runtime errors after migration: the embedding model
+`text-embedding-004` returns a 404 NOT_FOUND error, the LLM call
+`ChatGoogleGenerativeAI.predict()` raises an AttributeError, the
+`st.text_area()` call fails with an unsupported `rows` keyword argument,
+and text content disappears in dark mode due to theme color conflicts.
+
+[Response Summary]
+- Embedding Model: Replaced `models/text-embedding-004` with
+  `models/gemini-embedding-001` after programmatically querying the Gemini API
+  to list all available embedding models.
+- LLM Invocation: Replaced the deprecated `.predict()` method with the current
+  LangChain `.invoke()` API, extracting the response from `.content`.
+- Streamlit API Fix: Replaced the unsupported `rows=3` parameter in
+  `st.text_area()` with the correct `height=100` parameter.
+- Dark Mode Text Fix: Added a CSS rule forcing `color: var(--text-main)` on all
+  `[data-testid="stMarkdownContainer"]` elements to prevent theme-inherited
+  text color clashes.
+
+
+--------------------------------------------------------------------------------
+14. FREE-TIER RATE LIMIT HANDLING & BATCHED EMBEDDING
+--------------------------------------------------------------------------------
+[Prompt]
+Address Gemini API `RESOURCE_EXHAUSTED` (429) errors caused by the free-tier
+rate limit of 100 embedding requests per minute. Implement batched embedding
+with inter-batch delays and a visual progress indicator.
+
+[Response Summary]
+- Batched Embedding: Restructured the FAISS indexing loop to process documents
+  in batches of 20, calling `FAISS.from_documents()` for the first batch and
+  `vector_store.add_documents()` for subsequent batches.
+- Rate-Limit Delay: Added `time.sleep(1.5)` between batches to throttle
+  requests below the 100 requests/minute free-tier ceiling.
+- Visual Progress Bar: Integrated `st.progress()` with dynamic text updates
+  showing `Embedded X/Y chunks...` so users can monitor indexing status in
+  real time.
+
+
+--------------------------------------------------------------------------------
+15. RESIZABLE SPLIT PANE & CLICKABLE FILE REFERENCES
+--------------------------------------------------------------------------------
+[Prompt]
+Replace the sidebar width slider with a mouse-draggable resizer bar between the
+Chat and Code Viewer panels. Ensure that file reference badges displayed in AI
+responses are clickable and navigate the Code Viewer to the referenced file.
+
+[Response Summary]
+- JavaScript Resizer Component: Injected a custom `components.html()` script
+  that inserts a draggable `<div>` resizer bar between the two Streamlit columns.
+  Implements mousedown/mousemove/mouseup drag listeners with minimum width
+  constraints (250px per side).
+- Width Persistence: Saves the user's preferred column width ratio to
+  `localStorage` and restores it across page reloads.
+- Clickable References: Rendered each referenced file path as a `st.button()`
+  inside assistant chat messages. Clicking a reference sets
+  `st.session_state.active_file` and triggers `st.rerun()` to load the file
+  in the Code Viewer pane.
+
+
+--------------------------------------------------------------------------------
+16. SIDEBAR FILE TREE EXPLORER
+--------------------------------------------------------------------------------
+[Prompt]
+Replace the sidebar file selection dropdown with an interactive, collapsible
+directory tree structure so users can visually navigate the codebase hierarchy
+and understand the project layout at a glance.
+
+[Response Summary]
+- Tree Builder (`build_tree_dict`): Parses the flat list of `/`-separated file
+  paths into a nested dictionary structure of `{files: [], dirs: {}}` nodes.
+- Recursive Renderer (`render_tree`): Renders the tree using `st.expander()`
+  for directories (with folder emoji icons) and `st.button()` for files (with
+  document emoji icons). The currently active file is visually marked with a
+  pointer indicator.
+- Auto-Expansion Logic: Directory branches containing the currently active file
+  automatically expand (`expanded=True`), providing immediate path context.
+- CSS Styling: Added sidebar-scoped CSS overrides for secondary buttons to
+  render as flat, transparent, monospace-font file tree nodes with hover
+  highlights.
+
+
+--------------------------------------------------------------------------------
+17. ROBUST RATE-LIMIT FIX: EXPONENTIAL BACKOFF & TF-IDF FALLBACK
+--------------------------------------------------------------------------------
+[Prompt]
+Implement a permanent, repo-size-independent fix for Gemini API 429
+RESOURCE_EXHAUSTED errors during embedding. The solution must handle both
+per-minute rate limits and daily quota exhaustion gracefully, ensuring indexing
+never fails regardless of repository size or API quota state.
+
+[Response Summary]
+- Reduced Batch Size: Changed batch size from 20 to 5 documents per API call
+  with 4-second inter-batch delays, yielding ~75 requests/minute (safely under
+  the 100/minute free-tier ceiling).
+- Exponential Backoff Retry: Wrapped each batch in a retry loop (5 attempts)
+  with exponential backoff (10s, 20s, 40s, 80s, 90s). Parses the server's
+  `retry in Xs` hint from the error response and uses the longer delay.
+- TF-IDF Keyword Fallback: When all retries are exhausted (daily quota fully
+  depleted), automatically falls back to `TFIDFRetriever` from scikit-learn,
+  building a local keyword-based search index with zero API calls.
+- Dual Retriever Query Path: Updated the chat query handler to detect which
+  retriever is available (`vector_store` for semantic, `tfidf_retriever` for
+  keyword) and route queries accordingly.
+- Session State Tracking: Added `retriever_type` flag to session state so the
+  UI displays the current search mode (Semantic FAISS vs. Keyword TF-IDF).
+- Updated Dependencies: Added `scikit-learn` and `langchain-text-splitters` to
+  `requirements.txt` for deployment compatibility.
+
+
+================================================================================
+END OF DEVELOPMENT LOG
+================================================================================
