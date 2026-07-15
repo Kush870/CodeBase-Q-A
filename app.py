@@ -353,9 +353,6 @@ with st.sidebar:
         else:
             c3.metric("Size", f"{kb_size/1024:.2f} MB")
             
-        st.markdown("---")
-        st.markdown("### Workspace Options")
-        st.slider("Chat / Code Split Ratio", min_value=30, max_value=70, value=55, step=5, key="split_ratio_slider")
         
         st.markdown("---")
         st.markdown("### Codebase Files")
@@ -365,8 +362,12 @@ with st.sidebar:
         filtered_paths = [p for p in file_paths if search_query.lower() in p.lower()] if search_query else file_paths
         
         if filtered_paths:
-            # Let the user click and select the active file to load in the Code Viewer
-            selected = st.selectbox("Select file to view:", options=filtered_paths, index=0)
+            # Determine correct index for active file to keep sidebar selectbox in sync
+            default_idx = 0
+            if st.session_state.active_file in filtered_paths:
+                default_idx = filtered_paths.index(st.session_state.active_file)
+                
+            selected = st.selectbox("Select file to view:", options=filtered_paths, index=default_idx)
             if selected:
                 st.session_state.active_file = selected
         else:
@@ -382,9 +383,87 @@ with tab1:
     if not st.session_state.indexed_files:
         st.info("👈 Please enter a repository path in the sidebar and click **Index Codebase** to begin.")
     else:
-        # Create side-by-side columns (resizable simulation)
-        split_ratio = st.session_state.get('split_ratio_slider', 55)
-        col_chat, col_code = st.columns([split_ratio, 100 - split_ratio])
+        # Create side-by-side columns (resizable using mouse dragging via JS component)
+        col_chat, col_code = st.columns([1, 1])
+        
+        # Inject custom client-side Javascript mouse resizer component
+        import streamlit.components.v1 as components
+        components.html("""
+<script>
+    const doc = window.parent.document;
+    function setupDragPane() {
+        const blocks = doc.querySelectorAll('[data-testid="stHorizontalBlock"]');
+        blocks.forEach(block => {
+            // Find the horizontal block inside tab1 (Chat Workspace) containing 2 main columns
+            if (block.children.length === 2 && !block.querySelector('.custom-resizer-bar')) {
+                const leftCol = block.children[0];
+                const rightCol = block.children[1];
+                
+                // Create resizer bar element
+                const resizer = doc.createElement('div');
+                resizer.className = 'custom-resizer-bar';
+                resizer.style.width = '8px';
+                resizer.style.cursor = 'col-resize';
+                resizer.style.backgroundColor = '#eaeef2';
+                resizer.style.margin = '0 6px';
+                resizer.style.borderRadius = '4px';
+                resizer.style.flexShrink = '0';
+                resizer.style.alignSelf = 'stretch';
+                resizer.style.transition = 'background-color 0.2s';
+                
+                // Hover effect
+                resizer.addEventListener('mouseover', () => resizer.style.backgroundColor = '#0969da');
+                resizer.addEventListener('mouseout', () => resizer.style.backgroundColor = '#eaeef2');
+                
+                // Insert resizer between left and right columns
+                block.insertBefore(resizer, rightCol);
+                
+                // Ensure proper layout flex rules
+                leftCol.style.flex = 'none';
+                rightCol.style.flex = '1';
+                
+                // Restore saved width from localStorage
+                const savedWidth = localStorage.getItem('streamlit_left_col_width');
+                if (savedWidth) {
+                    leftCol.style.width = savedWidth + 'px';
+                } else {
+                    leftCol.style.width = '55%'; // Default initial ratio
+                }
+                
+                let isDragging = false;
+                
+                resizer.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    doc.body.style.cursor = 'col-resize';
+                    doc.body.style.userSelect = 'none';
+                    e.preventDefault();
+                });
+                
+                doc.addEventListener('mousemove', function(e) {
+                    if (!isDragging) return;
+                    const blockRect = block.getBoundingClientRect();
+                    const newWidth = e.clientX - blockRect.left;
+                    if (newWidth > 250 && newWidth < (blockRect.width - 250)) {
+                        leftCol.style.width = newWidth + 'px';
+                        localStorage.setItem('streamlit_left_col_width', newWidth);
+                    }
+                });
+                
+                doc.addEventListener('mouseup', function() {
+                    if (isDragging) {
+                        isDragging = false;
+                        doc.body.style.cursor = '';
+                        doc.body.style.userSelect = '';
+                    }
+                });
+            }
+        });
+    }
+    setupDragPane();
+    const observer = new MutationObserver(setupDragPane);
+    observer.observe(doc.body, { childList: true, subtree: true });
+</script>
+        """, height=0, width=0)
         
         # Left Split: Q&A Chat Pane
         with col_chat:
@@ -401,14 +480,15 @@ with tab1:
                     </div>
                     """, unsafe_allow_html=True)
                 else:
-                    for msg in st.session_state.chat_history:
+                    for idx_msg, msg in enumerate(st.session_state.chat_history):
                         with st.chat_message(msg["role"]):
                             st.write(msg["content"])
                             # Display references if assistant response
                             if msg["role"] == "assistant" and msg.get("references"):
                                 st.markdown("**Referenced Files:**")
-                                for ref in msg["references"]:
-                                    if st.button(ref, key=f"chat-ref-{ref}-{msg['content'][:10]}"):
+                                for idx_ref, ref in enumerate(msg["references"]):
+                                    ref_key = f"chat-ref-{idx_msg}-{idx_ref}-{ref}"
+                                    if st.button(ref, key=ref_key):
                                         st.session_state.active_file = ref
                                         st.rerun()
                                         
