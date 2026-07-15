@@ -434,7 +434,8 @@ Provide a detailed, technical explanation. Reference specific files, folders, an
                             model="gemini-2.5-flash",
                             google_api_key=gemini_key
                         )
-                        response = llm.predict(prompt)
+                        response_msg = llm.invoke(prompt)
+                        response = response_msg.content
                         
                         st.session_state.chat_history.append({
                             "role": "assistant",
@@ -542,7 +543,8 @@ Write a detailed, beautifully-formatted, professional Markdown section for the R
                             model="gemini-2.5-flash",
                             google_api_key=gemini_key
                         )
-                        draft = llm.predict(prompt)
+                        draft_msg = llm.invoke(prompt)
+                        draft = draft_msg.content
                         st.session_state.readme_draft = draft
                         st.success("Draft generated successfully!")
                     except Exception as e:
