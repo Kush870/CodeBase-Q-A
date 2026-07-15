@@ -41,8 +41,13 @@ st.markdown("""
     
     /* Styled widgets */
     .stApp {
-        background-color: var(--bg-primary);
-        color: var(--text-main);
+        background-color: var(--bg-primary) !important;
+        color: var(--text-main) !important;
+    }
+    
+    /* Enforce dark text for markdown blocks to prevent theme clash text disappearances */
+    .stApp [data-testid="stMarkdownContainer"] {
+        color: var(--text-main) !important;
     }
     
     /* Custom status card */
@@ -324,6 +329,10 @@ with st.sidebar:
             c3.metric("Size", f"{kb_size/1024:.2f} MB")
             
         st.markdown("---")
+        st.markdown("### Workspace Options")
+        st.slider("Chat / Code Split Ratio", min_value=30, max_value=70, value=55, step=5, key="split_ratio_slider")
+        
+        st.markdown("---")
         st.markdown("### Codebase Files")
         file_paths = [f['path'] for f in st.session_state.indexed_files]
         search_query = st.text_input("Filter files...", placeholder="Type to filter files list...")
@@ -349,7 +358,8 @@ with tab1:
         st.info("👈 Please enter a repository path in the sidebar and click **Index Codebase** to begin.")
     else:
         # Create side-by-side columns (resizable simulation)
-        col_chat, col_code = st.columns([1.1, 0.9])
+        split_ratio = st.session_state.get('split_ratio_slider', 55)
+        col_chat, col_code = st.columns([split_ratio, 100 - split_ratio])
         
         # Left Split: Q&A Chat Pane
         with col_chat:
@@ -505,7 +515,7 @@ with tab2:
             readme_instructions = st.text_area(
                 "Special Instructions (Optional)",
                 placeholder="e.g. Include setup parameters for Docker, write in a descriptive developer tone, outline requirements...",
-                rows=3
+                height=100
             )
             
             if st.button("Draft README Section", use_container_width=True):
