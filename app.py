@@ -250,7 +250,7 @@ def index_codebase(target_path, repo_type, api_key):
                 ))
                 
             # Split documents
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=120)
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
             split_docs = text_splitter.split_documents(lc_docs)
             
             # Generate Embeddings & load FAISS index
@@ -258,7 +258,32 @@ def index_codebase(target_path, repo_type, api_key):
                 model="models/gemini-embedding-001",
                 google_api_key=api_key
             )
-            vector_store = FAISS.from_documents(split_docs, embeddings)
+            
+            # Index in sleep-delayed batches to avoid Free Tier Rate Limits (RESOURCE_EXHAUSTED)
+            import time
+            batch_size = 20
+            vector_store = None
+            
+            # Initialize progress bar for semantic indexing
+            progress_bar = st.progress(0.0, text="Preparing chunks...")
+            total_chunks = len(split_docs)
+            
+            for i in range(0, total_chunks, batch_size):
+                batch = split_docs[i:i+batch_size]
+                if vector_store is None:
+                    vector_store = FAISS.from_documents(batch, embeddings)
+                else:
+                    vector_store.add_documents(batch)
+                
+                # Update progress
+                progress_percent = min(1.0, (i + len(batch)) / total_chunks)
+                progress_bar.progress(progress_percent, text=f"Embedded {min(total_chunks, i + len(batch))}/{total_chunks} chunks...")
+                
+                # Add delay to stay under the 100 requests/min rate limit
+                if i + batch_size < total_chunks:
+                    time.sleep(1.5)
+            
+            progress_bar.empty()
             st.session_state.vector_store = vector_store
             
             # Clear chat history for the new codebase index
